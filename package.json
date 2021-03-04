@@ -2,9 +2,9 @@
   "name": "unityrtc_template",
   "version": "1.0.0",
   "description": "template bridge for unity and webrtc for the webgl builds",
-  "main": "development/WEB/server/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "b:web": "cd development/WEB && npm run build",
+    "start": "node product/server.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,10 @@
   "bugs": {
     "url": "https://github.com/onkelhoy/unityrtc_template/issues"
   },
-  "homepage": "https://github.com/onkelhoy/unityrtc_template#readme"
+  "homepage": "https://github.com/onkelhoy/unityrtc_template#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "ws": "^7.4.3"
+  }
 }
