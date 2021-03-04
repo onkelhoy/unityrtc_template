@@ -1,0 +1,25 @@
+{
+  "name": "unityrtc_template",
+  "version": "1.0.0",
+  "description": "template bridge for unity and webrtc for the webgl builds",
+  "main": "development/WEB/server/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onkelhoy/unityrtc_template.git"
+  },
+  "keywords": [
+    "unity",
+    "webrtc",
+    "typescript",
+    "express"
+  ],
+  "author": "Henry Pap",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/onkelhoy/unityrtc_template/issues"
+  },
+  "homepage": "https://github.com/onkelhoy/unityrtc_template#readme"
+}
