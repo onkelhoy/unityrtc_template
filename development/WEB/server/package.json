@@ -1,0 +1,45 @@
+{
+  "name": "unityrtc_template-web",
+  "version": "1.0.0",
+  "description": "template bridge for unity and webrtc for the webgl builds",
+  "main": "source/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "node product",
+    "start:dev": "NODE_ENV=development webpack",
+    "run:dev": "NODE_ENV=development nodemon product/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onkelhoy/unityrtc_template.git"
+  },
+  "keywords": [
+    "unity",
+    "webrtc",
+    "typescript",
+    "express"
+  ],
+  "author": "Henry Pap",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/onkelhoy/unityrtc_template/issues"
+  },
+  "homepage": "https://github.com/onkelhoy/unityrtc_template#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@types/node": "^14.14.31",
+    "@types/ws": "^7.4.0",
+    "nodemon": "^2.0.7"
+  },
+  "peerDependencies": {
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.2.2",
+    "webpack": "^5.24.3",
+    "webpack-cli": "^4.5.0",
+    "webpack-node-externals": "^2.5.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "ws": "^7.4.3"
+  }
+}
