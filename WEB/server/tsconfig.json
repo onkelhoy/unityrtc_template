@@ -2,11 +2,12 @@
   "compileOnSave": true,
   "compilerOptions": {
     "baseUrl": "./",
-    "target": "es5",
+    "target": "es6",
     "module": "commonjs",
     "outDir": "../../product",
     "sourceMap": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noUnusedParameters": true
   },
-  "exclude": ["./node_modules", "./client"]
+  "exclude": ["./node_modules"]
 }

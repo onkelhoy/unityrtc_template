@@ -13,7 +13,7 @@ module.exports = {
   externals: [nodeExternals()],
   entry: "./source/index.ts",
   output: {
-    path: path.resolve(__dirname, "../../../product"),
+    path: path.resolve(__dirname, "../../product"),
     filename: "server.js",
   },
 

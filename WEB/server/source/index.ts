@@ -18,7 +18,7 @@ const app = express();
 //   res.status(200).sendFile(path.resolve(__dirname, "../public/index.html"))
 // );
 
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "./public")));
 
 // `server` is a vanilla Node.js HTTP server, so use
 // the same ws upgrade process described here:

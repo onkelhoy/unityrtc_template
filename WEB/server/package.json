@@ -5,10 +5,11 @@
   "main": "source/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
+    "build": "webpack && node cleanup.js",
     "start": "node product",
+    "ts-build": "tsc",
     "start:dev": "NODE_ENV=development webpack",
-    "run:dev": "NODE_ENV=development nodemon product/index.js"
+    "run:dev": "NODE_ENV=development nodemon product/server.js"
   },
   "repository": {
     "type": "git",
