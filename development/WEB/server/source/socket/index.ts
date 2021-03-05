@@ -12,7 +12,7 @@ import {
   SocketJoinMessage, 
   SocketLoginMessage,
   SocketSuccessType,
-} from '../../common/types';
+} from '';
 import { 
   Socket, 
 } from '../types';
