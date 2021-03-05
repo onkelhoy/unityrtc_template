@@ -10,20 +10,20 @@ module.exports = {
     extensions: [".ts", ".js"],
   },
   externals: [nodeExternals()],
-  entry: "./client/index.ts",
+  entry: "./source/index.ts",
   output: {
-    path: path.resolve(__dirname, "../../../../product/public"),
+    path: path.resolve(__dirname, "../../../product/public"),
     filename: "client.js",
   },
 
-  target: "node",
+  target: "web",
 
   module: {
     rules: [
       {
         test: /\.ts$/,
         use: ["ts-loader"],
-        exclude: [/node_modules/, "/server/"],
+        exclude: /node_modules/,
       },
     ],
   },

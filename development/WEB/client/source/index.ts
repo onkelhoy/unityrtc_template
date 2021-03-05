@@ -10,10 +10,6 @@ declare global {
       error: (type:string, peer_id:string, error:string) => void;
       disconnect: (peer_id:string) => void;
     }
-
-    connect:Function;
-    set_name:Function;
-    create:Function;
   }
 }
 
@@ -36,23 +32,3 @@ window.UNITY = {
     console.log("peer disonnect", peer_id);
   }
 };
-
-
-// temp functions for 
-window.connect = function () {
-  const room = (document.querySelector("#room") as HTMLInputElement).value;
-  const password = (document.querySelector("#password") as HTMLInputElement).value;
-  window.RTC.connect(room, password);
-}
-
-window.set_name = function() {
-  const name = (document.querySelector("#name") as HTMLInputElement).value;
-  window.RTC.login(name, "123");
-}
-
-window.create = function() {
-  const room = (document.querySelector("#room") as HTMLInputElement).value;
-  const password = (document.querySelector("#password") as HTMLInputElement).value;
-
-  window.RTC.create(room, password);
-}

@@ -1,6 +1,6 @@
 import { sendTo } from "../utils";
 import { Socket } from "../types";
-import { SocketMessage, ErrorSocketMessage, JoinAnswerMessage, SocketSuccessType } from '../../common/types';
+import { SocketMessage, ErrorSocketMessage, JoinAnswerMessage, SocketSuccessType } from 'unityrtc-types';
 
 class Room {
   name:string;

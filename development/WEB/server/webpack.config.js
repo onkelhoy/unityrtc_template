@@ -8,6 +8,7 @@ module.exports = {
   mode: NODE_ENV,
   resolve: {
     extensions: [".ts", ".js"],
+    symlinks: false,
   },
   externals: [nodeExternals()],
   entry: "./source/index.ts",
@@ -23,7 +24,7 @@ module.exports = {
       {
         test: /\.ts$/,
         use: ["ts-loader"],
-        exclude: [/node_modules/, "/client/"],
+        exclude: /node_modules/,
       },
     ],
   },

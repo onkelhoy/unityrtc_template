@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { SocketMessage } from '../common/types';
+import { SocketMessage } from 'unityrtc-types';
 
 export interface Socket extends WebSocket {
   room:string;
