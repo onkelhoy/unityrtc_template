@@ -1,4 +1,4 @@
-import { SocketAnswerMessage, SocketCandidateMessage, SocketOfferMessage } from 'unityrtc-types';
+import { SocketAnswerMessage, SocketCandidateMessage, SocketOfferMessage } from './global.types';
 import { SendFunction } from './types';
 
 interface Channel {

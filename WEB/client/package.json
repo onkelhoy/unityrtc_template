@@ -16,7 +16,6 @@
   "devDependencies": {
     "ts-loader": "^8.0.17",
     "typescript": "^4.2.3",
-    "unityrtc-types": "file:../private/@types",
     "webpack": "^5.24.3",
     "webpack-cli": "^4.5.0",
     "webpack-node-externals": "^2.5.2"

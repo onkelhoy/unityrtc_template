@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = __importDefault(require("ws"));
 const utils_1 = require("../utils");
-const unityrtc_types_1 = require("unityrtc-types");
+const global_types_1 = require("../global.types");
 const room_1 = __importDefault(require("./room"));
 const rooms = {};
 const wss = new ws_1.default.Server({ noServer: true });
@@ -76,7 +76,7 @@ function leave(user) {
 function login(user, data) {
     const { username, password } = data;
     if (username && password) {
-        utils_1.sendTo(user, { type: "success", success: unityrtc_types_1.SocketSuccessType.Login, token: "Cake is a Lie" });
+        utils_1.sendTo(user, { type: "success", success: global_types_1.SocketSuccessType.Login, token: "Cake is a Lie" });
     }
     else {
         utils_1.sendTo(user, {
@@ -111,7 +111,7 @@ function create(user, message) {
     }
     rooms[message.room] = new room_1.default(message.room, message.password);
     join(user, message);
-    utils_1.sendTo(user, { type: "success", success: unityrtc_types_1.SocketSuccessType.RoomCreate, });
+    utils_1.sendTo(user, { type: "success", success: global_types_1.SocketSuccessType.RoomCreate, });
 }
 exports.default = wss;
 //# sourceMappingURL=index.js.map

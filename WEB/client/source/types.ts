@@ -1,4 +1,4 @@
-import { SocketMessage } from "unityrtc-types";
+import { SocketMessage } from "./global.types";
 
 export type SocketEvents = {
   [key:string]: Function[]

@@ -12,7 +12,7 @@ import {
   SocketJoinMessage, 
   SocketLoginMessage,
   SocketSuccessType,
-} from 'unityrtc-types';
+} from '../global.types';
 import { 
   Socket, 
 } from '../types';

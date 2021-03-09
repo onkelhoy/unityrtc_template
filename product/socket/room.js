@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
-const unityrtc_types_1 = require("unityrtc-types");
+const global_types_1 = require("../global.types");
 class Room {
     constructor(name, password = "") {
         this.name = name;
@@ -25,7 +25,7 @@ class Room {
         else
             this.broadcast(user, { type: "join" });
         this.users[id] = user;
-        return { type: "success", success: unityrtc_types_1.SocketSuccessType.Join, id, };
+        return { type: "success", success: global_types_1.SocketSuccessType.Join, id, };
     }
     leave(user) {
         delete this.users[user.id];

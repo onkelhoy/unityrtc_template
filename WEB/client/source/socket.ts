@@ -3,7 +3,7 @@ import { 
   SocketMessage,
   SuccessSocketMessage,
   ErrorSocketMessage,
-} from 'unityrtc-types';
+} from './global.types';
 import { SocketEvents } from './types';
 
 class Socket {

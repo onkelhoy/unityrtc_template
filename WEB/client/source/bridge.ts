@@ -7,7 +7,7 @@ import { 
   JoinAnswerMessage,
   SocketJoinMessage,
   SocketSuccessType,
-} from 'unityrtc-types';
+} from './global.types';
 import { SendFunction } from './types';
 
 import Peer from './peer';
