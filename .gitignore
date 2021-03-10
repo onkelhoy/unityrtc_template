@@ -42,7 +42,7 @@ node_modules/
 jspm_packages/
 Library/
 product/
-GAME/unity-project
+GAME/
 
 
 # Snowpack dependency directory (https://snowpack.dev/)
@@ -68,6 +68,8 @@ web_modules/
 
 # Output of 'npm pack'
 *.tgz
+
+Temp/
 
 # Yarn Integrity file
 .yarn-integrity
