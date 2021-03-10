@@ -56,6 +56,8 @@ class Socket {
         const { id, host } = data as SocketMessageJoinAnswer;
         window.peerID = id;
         window.host = host;
+        window.UNITY.hostChange(host);
+        window.UNITY.setID(id);
         break;
       }
       case SocketTypes.Farwell:

@@ -10,6 +10,7 @@ declare global {
       error: (type:string, peer_id:string, error:string) => void;
       disconnect: (peer_id:string) => void;
       hostChange: (host:string) => void;
+      setID: (id:string) => void;
     },
     peerID:string;
     host:string;
@@ -37,4 +38,7 @@ window.UNITY = {
   hostChange: (host) => {
     console.log('new host', host);
   },
+  setID: (id) => {
+    console.log('ID set', id);
+  }
 };

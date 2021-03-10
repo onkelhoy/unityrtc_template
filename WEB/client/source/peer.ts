@@ -35,6 +35,7 @@ class Peer {
       pc = new webkitRTCPeerConnection(configuration);
     }
 
+    this.connection = pc;
     // setup ice-handeling
     pc.onicecandidate = (event) => {
       if (event.candidate) {
@@ -46,15 +47,15 @@ class Peer {
         } as SocketRequestCandidate);
       }
     };
-    // pc.onicegatheringstatechange = () => {
-    //   console.log("ICE gathering state");
-    // };
+    pc.onicegatheringstatechange = () => {
+      console.log("ICE gathering state");
+    };
     pc.onicecandidateerror = (error) =>
       window.UNITY.error("ice", this.remote, error.errorText);
 
-    // pc.oniceconnectionstatechange = (evt) => {
-    //   console.log("ICE state change", evt);
-    // };
+    pc.oniceconnectionstatechange = (evt) => {
+      console.log("ICE state change", evt);
+    };
 
     pc.onconnectionstatechange = this.ConnectionStateChange.bind(this);
     pc.ondatachannel = this.onDataChannel.bind(this);
@@ -64,8 +65,6 @@ class Peer {
     this.channels = {};
     this.close = close;
     this.kill = this.kill.bind(this);
-
-    this.connection = pc;
   }
 
   kill() {
@@ -116,6 +115,7 @@ class Peer {
   }
 
   onChannelOpen(label:string) {
+    console.log('channel now open')
     if (this.channels[label].queue.length > 0) {
       // sending all messages in queue
       console.log("rensing queue", label, this.channels[label].queue.length);
@@ -136,6 +136,7 @@ class Peer {
   }
 
   onChannelError(name:string, event:RTCErrorEvent) {
+    console.log('channel error', name)
     window.UNITY.error("channel", name, event.error.message);
   }
 
@@ -180,6 +181,7 @@ class Peer {
   }
 
   handleCandidate(candidate:RTCIceCandidateInit) {
+    console.log("handle-candidate", this.connection, candidate);
     this.connection.addIceCandidate(new RTCIceCandidate(candidate));
   }
 
@@ -204,6 +206,7 @@ class Peer {
         this.channels[label].channel.send(message);
       } else {
         // store if for later
+        console.log('not open yet');
         this.channels[label].queue.push(message);
       }
     }

@@ -25,7 +25,7 @@ class Room {
         else
             this.broadcast(user, { type: common_types_1.SocketTypes.Join, id: user.id });
         this.users[id] = user;
-        utils_1.sendTo(user, { type: common_types_1.SocketTypes.JoinAnswer, id });
+        utils_1.sendTo(user, { type: common_types_1.SocketTypes.JoinAnswer, id, host: this.host });
     }
     leave(user) {
         delete this.users[user.id];

@@ -71,6 +71,7 @@ export interface SocketMessageCreate extends SocketMessage {
 
 export interface SocketMessageJoinAnswer extends SocketMessage {
   id:string;
+  host:string;
 }
 
 export interface SocketMessageLeave extends SocketMessage {

@@ -50,7 +50,11 @@ class Bridge {
     this.peers[from].handleOffer(this._socketsend, offer);
   }
   _answer = ({ from, answer } : SocketMessageAnswer) => this.peers[from].handleAnswer(answer);
-  _candidate = ({ from, candidate } : SocketMessageCandidate) => this.peers[from].handleCandidate(candidate);
+  _candidate = ({ from, candidate } : SocketMessageCandidate) => {
+    if (!this.peers[from])
+      this.peers[from] = new Peer(this._socketsend, from, this.Leave);
+    this.peers[from].handleCandidate(candidate);
+  }
 
 
   Send(to:string, message:string, channels:string|string[]) {
