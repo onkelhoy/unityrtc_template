@@ -1,5 +1,7 @@
 import Bridge from './bridge';
 
+// unityInstance = UnityLoader.instantiate("unityContainer", "Build/build.json", {onProgress: UnityProgress});
+
 declare global {
   interface Window { 
     RTC: Bridge; 
