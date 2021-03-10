@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "./source",
     "target": "es6",
     "module": "commonjs",
     "outDir": "../../product",

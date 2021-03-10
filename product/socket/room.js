@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
-const global_types_1 = require("../global.types");
+const common_types_1 = require("../common.types");
 class Room {
     constructor(name, password = "") {
         this.name = name;
@@ -12,7 +12,7 @@ class Room {
     }
     join(user, password) {
         if (password !== this.password) {
-            return { type: "error", error: "password", message: "incorrect password", code: 2 };
+            utils_1.sendTo(user, { type: common_types_1.SocketTypes.Error, error: common_types_1.SocketErrorType.Join, message: "incorrect password" });
         }
         // notify all
         const id = `${this.name}#${this.count}`;
@@ -23,16 +23,16 @@ class Room {
             this.host = id;
         }
         else
-            this.broadcast(user, { type: "join" });
+            this.broadcast(user, { type: common_types_1.SocketTypes.Join, id: user.id });
         this.users[id] = user;
-        return { type: "success", success: global_types_1.SocketSuccessType.Join, id, };
+        utils_1.sendTo(user, { type: common_types_1.SocketTypes.JoinAnswer, id });
     }
     leave(user) {
         delete this.users[user.id];
         // notify all in room
         this.count--;
         if (this.count > 0) {
-            this.broadcast(user, { type: "leave" });
+            this.broadcast(user, { type: common_types_1.SocketTypes.Leave, id: user.id });
             this.host = Object.keys(this.users)[0];
         }
     }
@@ -47,10 +47,15 @@ class Room {
     }
     farwell(user) {
         if (user.id === this.host) {
-            this.broadcast(null, { type: "farwell" });
+            this.broadcast(null, { type: common_types_1.SocketTypes.Farwell });
         }
         else
-            this.send(user.id, { type: "error", message: "You are not host", error: "unothorized", code: -1 });
+            this.send(user.id, {
+                type: common_types_1.SocketTypes.Error,
+                message: "You are not host",
+                error: common_types_1.SocketErrorType.Host,
+                code: -1
+            });
     }
     send(id, message) {
         if (!this.users[id])

@@ -1,13 +1,14 @@
 import { 
-  SocketAnswerMessage,
-  SocketCandidateMessage,
-  SocketOfferMessage,
-  SocketCreateMessage,
-  SocketLoginMessage,
-  JoinAnswerMessage,
-  SocketJoinMessage,
-  SocketSuccessType,
-} from './global.types';
+  SocketMessageAnswer,
+  SocketMessageCandidate,
+  SocketMessageOffer,
+  SocketMessageJoin,
+  SocketMessageHostChange,
+
+  SocketRequestCreate,
+  SocketRequestJoin,
+  SocketTypes,
+} from './common.types';
 import { SendFunction } from './types';
 
 import Peer from './peer';
@@ -25,67 +26,58 @@ class Bridge {
     this.peers = {};
     this.id = null;
 
-    this.socket.on("join", this._join.bind(this));
-    this.socket.on('success', this._success.bind(this));
-    this.socket.on("offer", this._offer.bind(this));
-
-    this.socket.on("answer", ({ target, answer } : SocketAnswerMessage) =>
-      this.peers[target].handleAnswer(answer)
-    );
-    this.socket.on("candidate", ({ target, candidate } : SocketCandidateMessage) =>
-      this.peers[target].handleCandidate(candidate)
-    );
+    this.socket.on(SocketTypes.Join, this._otherjoin);
+    this.socket.on(SocketTypes.HostChange, this._hostChange);
+    this.socket.on(SocketTypes.Offer, this._offer);
+    this.socket.on(SocketTypes.Answer, this._answer);
+    this.socket.on(SocketTypes.Candidate, this._candidate);
 
     this._socketsend = this.socket.send.bind(this.socket);
   }
 
-  _join({ target } : SocketAnswerMessage) {
-    if (!this.peers[target])
-      this.peers[target] = new Peer(this._socketsend, target, this.leave.bind(this));
-    this.peers[target].createOffer(this._socketsend, this.id as string);
+  _hostChange = ({ host } : SocketMessageHostChange) => {
+    window.host = host;
+    window.UNITY.hostChange(host);
   }
-  _offer({ target, offer } : SocketOfferMessage) {
-    if (!this.peers[target])
-      this.peers[target] = new Peer(this._socketsend, target, this.leave.bind(this));
-    this.peers[target].handleOffer(this._socketsend, offer);
+  _otherjoin = ({ id } : SocketMessageJoin) => {
+    if (!this.peers[id])
+      this.peers[id] = new Peer(this._socketsend, id, this.Leave);
+    this.peers[id].createOffer(this._socketsend, this.id as string);
   }
-  _success(message : JoinAnswerMessage):void {
-    switch(message.success) {
-      case SocketSuccessType.Join: {
-        this.id = message.id;
-        break;
-      }
-    }
+  _offer = ({ from, offer } : SocketMessageOffer) => {
+    if (!this.peers[from])
+      this.peers[from] = new Peer(this._socketsend, from, this.Leave);
+    this.peers[from].handleOffer(this._socketsend, offer);
   }
+  _answer = ({ from, answer } : SocketMessageAnswer) => this.peers[from].handleAnswer(answer);
+  _candidate = ({ from, candidate } : SocketMessageCandidate) => this.peers[from].handleCandidate(candidate);
 
-  send(to:string, message:string, channels:string|string[]) {
+
+  Send(to:string, message:string, channels:string|string[]) {
     if (!this.peers[to]) return false;
 
     this.peers[to].send(message, channels);
     return true;
   }
-  broadcast(message:string, channels:string|string[]) {
+  Broadcast(message:string, channels:string|string[]) {
     for (const peer in this.peers) {
       this.peers[peer].send(message, channels);
     }
   }
-
-
-
-  leave(target:string) {
+  Leave = (target:string) => {
     delete this.peers[target];
   }
-
-  login(username:string, password:string) {
-    this.socket.send({ type: "login", credentials: { username, password } } as SocketLoginMessage);
-  }
   
-  create(room:string, password:string) {
-    this.socket.send({ type: "create", room, password } as SocketCreateMessage);
+  Create(room:string, password:string) {
+    this.socket.send({ type: SocketTypes.Create, room, password } as SocketRequestCreate);
   }
 
-  connect(room:string, password:string) {
-    this.socket.send({ type: "join", room, password } as SocketJoinMessage);
+  Connect(room:string, password:string) {
+    this.socket.send({ type: SocketTypes.Join, room, password } as SocketRequestJoin);
+  }
+
+  Start() {
+    this.socket.send({ type: SocketTypes.Farwell });
   }
 }
 

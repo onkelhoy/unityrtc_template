@@ -1,4 +1,10 @@
-import { SocketAnswerMessage, SocketCandidateMessage, SocketOfferMessage } from './global.types';
+import { 
+  SocketRequestAnswer, 
+  SocketRequestCandidate, 
+  SocketRequestOffer, 
+
+  SocketTypes
+} from './common.types';
 import { SendFunction } from './types';
 
 interface Channel {
@@ -21,7 +27,7 @@ class Peer {
       ],
     };
 
-    let pc = null;
+    let pc:RTCPeerConnection = null;
     if (window.RTCPeerConnection) {
       pc = new RTCPeerConnection(configuration);
     }
@@ -33,21 +39,22 @@ class Peer {
     pc.onicecandidate = (event) => {
       if (event.candidate) {
         send({
-          type: "candidate",
+          type: SocketTypes.Candidate,
           candidate: event.candidate,
-          target: this.remote,
-        } as SocketCandidateMessage);
+          to: this.remote,
+          from: window.peerID
+        } as SocketRequestCandidate);
       }
     };
-    pc.onicegatheringstatechange = () => {
-      console.log("ICE gathering state");
-    };
+    // pc.onicegatheringstatechange = () => {
+    //   console.log("ICE gathering state");
+    // };
     pc.onicecandidateerror = (error) =>
       window.UNITY.error("ice", this.remote, error.errorText);
 
-    pc.oniceconnectionstatechange = (evt) => {
-      console.log("ICE state change", evt);
-    };
+    // pc.oniceconnectionstatechange = (evt) => {
+    //   console.log("ICE state change", evt);
+    // };
 
     pc.onconnectionstatechange = this.ConnectionStateChange.bind(this);
     pc.ondatachannel = this.onDataChannel.bind(this);
@@ -140,7 +147,7 @@ class Peer {
     return this.connection
       .createOffer()
       .then((offer) => {
-        send({ type: "offer", target: from, offer } as SocketOfferMessage);
+        send({ type: SocketTypes.Offer, to: from, from: window.peerID, offer } as SocketRequestOffer);
 
         this.connection.setLocalDescription(offer);
       })
@@ -160,7 +167,7 @@ class Peer {
       .then((answer) => {
         this.connection.setLocalDescription(answer);
 
-        send({ type: "answer", answer, target: this.remote } as SocketAnswerMessage);
+        send({ type: SocketTypes.Answer, answer, to: this.remote, from: window.peerID } as SocketRequestAnswer);
       })
       .catch((error) => {
         console.error("answer-error", error);
@@ -190,7 +197,7 @@ class Peer {
       channels = Object.keys(this.channels);
     }
 
-    console.log("sending message", message, channels);
+    // console.log("sending message", message, channels);
 
     for (const label of channels) {
       if (this.channels[label].channel.readyState === "open") {

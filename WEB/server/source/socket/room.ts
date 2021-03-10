@@ -1,6 +1,14 @@
 import { sendTo } from "../utils";
 import { Socket } from "../types";
-import { SocketMessage, ErrorSocketMessage, JoinAnswerMessage, SocketSuccessType } from '../global.types';
+import { 
+  SocketMessage, 
+  SocketMessageLeave,
+  SocketMessageJoin,
+  SocketMessageJoinAnswer,
+  SocketMessageError, 
+  SocketTypes,
+  SocketErrorType
+} from '../common.types';
 
 class Room {
   name:string;
@@ -17,9 +25,9 @@ class Room {
     this.host = null;
   }
 
-  join(user:Socket, password:string):ErrorSocketMessage|JoinAnswerMessage {
+  join(user:Socket, password:string):void {
     if (password !== this.password) {
-      return { type: "error", error: "password", message: "incorrect password", code: 2 } as ErrorSocketMessage;
+      sendTo(user, { type: SocketTypes.Error, error: SocketErrorType.Join, message: "incorrect password" } as SocketMessageError);
     }
     // notify all
     const id = `${this.name}#${this.count}`;
@@ -29,10 +37,10 @@ class Room {
 
     if (!this.host) {
       this.host = id;
-    } else this.broadcast(user, { type: "join" });
+    } else this.broadcast(user, { type: SocketTypes.Join, id: user.id } as SocketMessageJoin);
 
     this.users[id] = user;
-    return { type: "success", success: SocketSuccessType.Join, id,  } as JoinAnswerMessage;
+    sendTo(user, { type: SocketTypes.JoinAnswer, id, host: this.host } as SocketMessageJoinAnswer);
   }
 
   leave(user:Socket) {
@@ -40,7 +48,7 @@ class Room {
     // notify all in room
     this.count--;
     if (this.count > 0) {
-      this.broadcast(user, { type: "leave" });
+      this.broadcast(user, { type: SocketTypes.Leave, id: user.id } as SocketMessageLeave);
       this.host = Object.keys(this.users)[0];
     }
   }
@@ -58,8 +66,13 @@ class Room {
 
   farwell(user:Socket) {
     if (user.id === this.host) {
-      this.broadcast(null, { type: "farwell" });
-    } else this.send(user.id, { type: "error", message: "You are not host", error: "unothorized", code: -1 } as ErrorSocketMessage);
+      this.broadcast(null, { type: SocketTypes.Farwell });
+    } else this.send(user.id, { 
+      type: SocketTypes.Error, 
+      message: "You are not host", 
+      error: SocketErrorType.Host, 
+      code: -1 
+    } as SocketMessageError);
   }
 
   send(id:string, message:SocketMessage) {

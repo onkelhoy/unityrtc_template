@@ -1,18 +1,23 @@
 import WebSocket from "ws";
 import { sendTo } from "../utils";
 import { 
+  SocketRequestCandidate, 
+  SocketRequestOffer,
+  SocketRequestAnswer,
+  SocketRequestJoin,
+  SocketRequestCreate,
+
   SocketMessage, 
-  Credentials, 
-  ErrorSocketMessage, 
-  SuccessSocketMessage,
-  SocketCandidateMessage, 
-  SocketAnswerMessage,
-  SocketOfferMessage,
-  SocketCreateMessage, 
-  SocketJoinMessage, 
-  SocketLoginMessage,
-  SocketSuccessType,
-} from '../global.types';
+  SocketMessageError, 
+  SocketMessageCandidate, 
+  SocketMessageAnswer,
+  SocketMessageOffer,
+  SocketMessageCreate,  
+  SocketMessageJoin,
+  SocketMessageJoinAnswer,
+  SocketTypes,
+  SocketErrorType,
+} from '../common.types';
 import { 
   Socket, 
 } from '../types';
@@ -31,21 +36,20 @@ function onMessage(this:Socket, message: string) {
   const user = this;
 
   switch (data.type) {
-    case "offer":
-      return offer(user, data as SocketOfferMessage);
-    case "login":
-      return login(user, (data as SocketLoginMessage).credentials);
-    case "answer":
-      return answer(user, data as SocketAnswerMessage);
-    case "candidate":
-      return candidate(user, data as SocketCandidateMessage);
-    case "leave":
+    case SocketTypes.Offer:
+      return offer(user, data as SocketRequestOffer);
+    case SocketTypes.Answer:
+      return answer(user, data as SocketRequestAnswer);
+    case SocketTypes.Candidate:
+      return candidate(user, data as SocketRequestCandidate);
+    case SocketTypes.Leave:
       return leave(user);
-    case "join":
-      return join(user, data as SocketJoinMessage);
-    case "create": {
-      return create(user, data as SocketCreateMessage);
-    }
+    case SocketTypes.Join:
+      return join(user, data as SocketRequestJoin);
+    case SocketTypes.Create: 
+      return create(user, data as SocketRequestCreate);
+    case SocketTypes.Farwell:
+      return farwell(user);
   }
 }
 
@@ -55,34 +59,36 @@ function roomCheck(user:Socket, cb:Function) {
   if (!!rooms[room]) cb();
   else {
     sendTo(user, {
-      type: "error",
-      error: "room",
+      type: SocketTypes.Error,
+      error: SocketErrorType.Room,
       message: "Room is not existing",
-      code: 4,
-    } as ErrorSocketMessage);
+    } as SocketMessageError);
   }
 }
 
-function join(user:Socket, message:SocketJoinMessage) {
-  if (!message.token) {
-    sendTo(user, rooms[message.room].join(user, message.password));
-  }
+
+function farwell(user:Socket) {
+  roomCheck(user, () => {
+    rooms[user.room].farwell(user);
+  });
+}
+
+function join(user:Socket, message:SocketRequestJoin) {
   if (rooms[message.room]) {
-    sendTo(user, rooms[message.room].join(user, message.password));
+    rooms[message.room].join(user, message.password);
   } else {
     sendTo(user, {
-      type: "error",
-      error: "room",
+      type: SocketTypes.Error,
+      error: SocketErrorType.Room,
       message: "Room is not existing",
-      code: 4,
-    } as ErrorSocketMessage);
+    } as SocketMessageError);
   }
 }
 
-function answer(user:Socket, message: SocketAnswerMessage) {
+function answer(user:Socket, message: SocketRequestAnswer) {
   roomCheck(user, () => {
-    const newMessage = { ...message, id: user.id };
-    rooms[user.room].send(message.target, newMessage);
+    const newMessage:SocketMessageAnswer = { type: SocketTypes.Answer, from: message.from, answer: message.answer };
+    rooms[user.room].send(message.to, newMessage);
   });
 }
 
@@ -92,50 +98,33 @@ function leave(user:Socket) {
   });
 }
 
-function login(user:Socket, data:Credentials) {
-  const { username, password } = data;
-
-  if (username && password) {
-    sendTo(user, { type: "success", success: SocketSuccessType.Login, token: "Cake is a Lie" } as SuccessSocketMessage);
-  } else {
-    sendTo(user, {
-      type: "error",
-      error: "login",
-      message: "Wrong credentials",
-      code: -1,
-    } as ErrorSocketMessage);
-  }
-}
-
-function offer(user:Socket, message: SocketOfferMessage) {
+function offer(user:Socket, message: SocketRequestOffer) {
   roomCheck(user, () => {
-    const newMessage = { ...message, id: user.id };
-    rooms[user.room].send(message.target, newMessage);
+    const newMessage:SocketMessageOffer = { type: SocketTypes.Offer, from: message.from, offer: message.offer };
+    rooms[user.room].send(message.to, newMessage);
   });
 }
 
-function candidate(user:Socket, message:SocketCandidateMessage) {
+function candidate(user:Socket, message:SocketRequestCandidate) {
   roomCheck(user, () => {
-    const newMessage = { ...message, id: user.id };
-    rooms[user.room].send(message.target, newMessage);
+    const newMessage:SocketMessageCandidate = { type: SocketTypes.Candidate, from: message.from, candidate: message.candidate };
+    rooms[user.room].send(message.to, newMessage);
   });
 }
 
-function create(user:Socket, message: SocketCreateMessage) {
+function create(user:Socket, message: SocketRequestCreate) {
   if (rooms[message.room]) {
     // error
     sendTo(user, {
-      type: "error",
-      error: "room",
+      type: SocketTypes.Error,
+      error: SocketErrorType.Room,
       message: "This room already exists",
-      code: 1,
-    } as ErrorSocketMessage);
+    } as SocketMessageError);
   }
 
   rooms[message.room] = new Room(message.room, message.password);
 
-  join(user, message as SocketJoinMessage);
-  sendTo(user, { type: "success", success: SocketSuccessType.RoomCreate,  } as SuccessSocketMessage);
+  join(user, message as SocketRequestJoin);
 }
 
 export default wss;

@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { SocketMessage } from './global.types';
+import { SocketMessage } from './common.types';
 
 export interface Socket extends WebSocket {
   room:string;

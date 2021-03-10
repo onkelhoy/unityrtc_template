@@ -9,7 +9,10 @@ declare global {
       message: (channel:string, peer_id:string, msg:string) => void;
       error: (type:string, peer_id:string, error:string) => void;
       disconnect: (peer_id:string) => void;
-    }
+      hostChange: (host:string) => void;
+    },
+    peerID:string;
+    host:string;
   }
 }
 
@@ -30,5 +33,8 @@ window.UNITY = {
   },
   disconnect: (peer_id) => {
     console.log("peer disonnect", peer_id);
-  }
+  },
+  hostChange: (host) => {
+    console.log('new host', host);
+  },
 };
