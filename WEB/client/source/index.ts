@@ -11,6 +11,7 @@ declare global {
       disconnect: (peer_id:string) => void;
       hostChange: (host:string) => void;
       setID: (id:string) => void;
+      socketError: (type:string, message:string) => void;
     },
     peerID:string;
     host:string;
@@ -20,6 +21,9 @@ declare global {
 window.RTC = new Bridge();
 
 window.UNITY = {
+  socketError: (type, message) => {
+    console.error('socker-error', type, message);
+  },
   connectionUpdate: (id, state) => {
     console.log("state update", id, state);
   },

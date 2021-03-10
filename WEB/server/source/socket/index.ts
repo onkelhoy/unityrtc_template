@@ -70,6 +70,7 @@ function roomCheck(user:Socket, cb:Function) {
 function farwell(user:Socket) {
   roomCheck(user, () => {
     rooms[user.room].farwell(user);
+    delete rooms[user.room];
   });
 }
 

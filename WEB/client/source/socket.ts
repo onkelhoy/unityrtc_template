@@ -33,6 +33,11 @@ class Socket {
     this.ws.send(msg);
   }
 
+  close() {
+    this.send({ type: SocketTypes.Leave });
+    if (this.ws) this.ws.close();
+  }
+
   error({ error, message } : SocketMessageError) {
     this.fire("error-" + error, message);
   }
@@ -60,10 +65,6 @@ class Socket {
         window.UNITY.setID(id);
         break;
       }
-      case SocketTypes.Farwell:
-        console.log("[SOCKET] Goodbye, thats it! out and fly child!");
-        this.ws.close();
-        break;
       default:
         break;
     }

@@ -44,6 +44,7 @@ class Room {
   }
 
   leave(user:Socket) {
+    this.users[user.id].close();
     delete this.users[user.id];
     // notify all in room
     this.count--;
@@ -65,6 +66,7 @@ class Room {
   }
 
   farwell(user:Socket) {
+    console.log('farwell... hmm', user.id, this.host);
     if (user.id === this.host) {
       this.broadcast(null, { type: SocketTypes.Farwell });
     } else this.send(user.id, { 

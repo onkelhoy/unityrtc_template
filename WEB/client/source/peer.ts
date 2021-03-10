@@ -159,6 +159,7 @@ class Peer {
   }
 
   handleOffer(send:SendFunction, desription:RTCSessionDescriptionInit) {
+    console.log('handle offer');
     // we are connecting
     this.connection.setRemoteDescription(new RTCSessionDescription(desription));
 
