@@ -47,15 +47,15 @@ class Peer {
         } as SocketRequestCandidate);
       }
     };
-    pc.onicegatheringstatechange = () => {
-      console.log("ICE gathering state");
-    };
+    // pc.onicegatheringstatechange = () => {
+    //   console.log("ICE gathering state");
+    // };
     pc.onicecandidateerror = (error) =>
       window.UNITY.error("ice", this.remote, error.errorText);
 
-    pc.oniceconnectionstatechange = (evt) => {
-      console.log("ICE state change", evt);
-    };
+    // pc.oniceconnectionstatechange = (evt) => {
+    //   console.log("ICE state change", evt);
+    // };
 
     pc.onconnectionstatechange = this.ConnectionStateChange.bind(this);
     pc.ondatachannel = this.onDataChannel.bind(this);
@@ -100,9 +100,8 @@ class Peer {
     channel.onmessage = (event) => this.onChannelMessage(channel.label, event);
     channel.onerror = (error) => this.onChannelError(channel.label, error);
     channel.onopen = () => this.onChannelOpen(channel.label);
-    channel.onclose = (event) => this.onChannelClose(channel.label, event);
+    channel.onclose = () => this.onChannelClose(channel.label);
 
-    console.log("incomming channel:", channel.label);
     this.channels[channel.label] = {
       channel,
       queue: [],
@@ -115,19 +114,18 @@ class Peer {
   }
 
   onChannelOpen(label:string) {
-    console.log('channel now open')
     if (this.channels[label].queue.length > 0) {
       // sending all messages in queue
-      console.log("rensing queue", label, this.channels[label].queue.length);
       for (const message of this.channels[label].queue) {
         this.send(message, label);
       }
       this.channels[label].queue = [];
     }
+
+    window.UNITY.channelUpdate(label, "connected");
   }
 
-  onChannelClose(label:string, event:Event) {
-    console.log("channel is closed", label, event.type);
+  onChannelClose(label:string) {
     window.UNITY.channelUpdate(label, "closed");
   }
 
@@ -136,7 +134,7 @@ class Peer {
   }
 
   onChannelError(name:string, event:RTCErrorEvent) {
-    console.log('channel error', name)
+    window.UNITY.channelUpdate(name, "failed");
     window.UNITY.error("channel", name, event.error.message);
   }
 
@@ -159,7 +157,6 @@ class Peer {
   }
 
   handleOffer(send:SendFunction, desription:RTCSessionDescriptionInit) {
-    console.log('handle offer');
     // we are connecting
     this.connection.setRemoteDescription(new RTCSessionDescription(desription));
 
@@ -172,8 +169,7 @@ class Peer {
         send({ type: SocketTypes.Answer, answer, to: this.remote, from: window.peerID } as SocketRequestAnswer);
       })
       .catch((error) => {
-        console.error("answer-error", error);
-        alert("Error when creating an answer");
+        window.UNITY.answerError(error);
       });
   }
 
@@ -182,7 +178,6 @@ class Peer {
   }
 
   handleCandidate(candidate:RTCIceCandidateInit) {
-    console.log("handle-candidate", this.connection, candidate);
     this.connection.addIceCandidate(new RTCIceCandidate(candidate));
   }
 
@@ -207,7 +202,6 @@ class Peer {
         this.channels[label].channel.send(message);
       } else {
         // store if for later
-        console.log('not open yet');
         this.channels[label].queue.push(message);
       }
     }

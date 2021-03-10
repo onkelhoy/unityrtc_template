@@ -12,6 +12,7 @@ declare global {
       hostChange: (host:string) => void;
       setID: (id:string) => void;
       socketError: (type:string, message:string) => void;
+      answerError: (error:any) => void; // cant figure out what type error is, should check docs
     },
     peerID:string;
     host:string;
@@ -23,6 +24,9 @@ window.RTC = new Bridge();
 window.UNITY = {
   socketError: (type, message) => {
     console.error('socker-error', type, message);
+  },
+  answerError: (error) => {
+    console.error('answer error', error);
   },
   connectionUpdate: (id, state) => {
     console.log("state update", id, state);

@@ -38,8 +38,8 @@ class Socket {
     if (this.ws) this.ws.close();
   }
 
-  error({ error, message } : SocketMessageError) {
-    this.fire("error-" + error, message);
+  error(e : SocketMessageError) {
+    this.fire(SocketTypes.Error + "-" + e.error, e);
   }
 
   message(msg:MessageEvent) {

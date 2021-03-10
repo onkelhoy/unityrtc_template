@@ -5,7 +5,7 @@
   "scripts": {
     "b:web": "cd WEB && npm run build",
     "start": "node product/index.js",
-    "buildRun": "npm run b:web && npm run start"
+    "buildstart": "npm run b:web && npm run start"
   },
   "repository": {
     "type": "git",

@@ -66,15 +66,18 @@ class Room {
   }
 
   farwell(user:Socket) {
-    console.log('farwell... hmm', user.id, this.host);
     if (user.id === this.host) {
       this.broadcast(null, { type: SocketTypes.Farwell });
-    } else this.send(user.id, { 
+      return true;
+    } 
+    
+    this.send(user.id, { 
       type: SocketTypes.Error, 
       message: "You are not host", 
       error: SocketErrorType.Host, 
       code: -1 
     } as SocketMessageError);
+    return false;
   }
 
   send(id:string, message:SocketMessage) {
