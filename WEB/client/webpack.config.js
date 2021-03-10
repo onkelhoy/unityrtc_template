@@ -6,7 +6,7 @@ const { NODE_ENV = "production" } = process.env;
 module.exports = {
   watch: NODE_ENV === "development",
   mode: NODE_ENV,
-  devtool: "source-map",
+  // devtool: "source-map",
   resolve: {
     extensions: [".ts", ".js"],
   },
