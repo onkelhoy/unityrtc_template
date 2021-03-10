@@ -1,18 +1,37 @@
 # unityrtc-template
 
-Simple yet elegant template solution for unity built on webGL to take use of the webRTC library. The template includes a typescript based web solution both with server to serve signaling but also the actual peer responsible for your online communication.
+Simple yet elegant template solution for unity built on webGL to take use of the webRTC library. The template includes a typescript based web solution both with server to both serve your game together with a webrtc peer solution plus act as an signaling server.
+
+your game will end up under `/project` together with server that will not only serve your game but also give you free multiplayer.
 
 npm was used as a package manager for all web content.
 
-## GAME
+# To use
+
+Make sure your game is inside /GAME
+
+Run the following commands
+(_think it should be possible to have all dependancies inside root, but had some problems.._)
+
+```
+1. cd WEB/client
+2. npm install
+3. cd ../server
+4. npm install
+5. cd ../..                # root
+6. npm install             # to install production required deps: (express, ws)
+7. npm run buildstart
+```
+
+## /GAME
 
 this is where you should put your own game
 
-## WEB
+## /WEB
 
 triggers build for both client & server, copies common types for both (wanted a solution that involves one file but built takes it in - peerDependency does not work). Also moves /WEB/public into /product/public
 
-### Server
+### /WEB/Server
 
 uses express and ws to host the server on default port 8080, but can also add `.env` under /WEB
 can easily be extended to
@@ -21,7 +40,7 @@ can easily be extended to
 SERVER = <desired port number>
 ```
 
-### Client
+### /WEB/Client
 
 The most exiting as its direct linked with unity
 
@@ -51,14 +70,4 @@ terminate: () => void
 farwell: () => void
 create: (room:string, password:string) => void
 connect: (room:string, password:string) => void
-```
-
-# To use
-
-Make sure your game is inside /GAME
-Run the following commands
-
-```
-1. npm install
-2. npm run buildstart
 ```
