@@ -25,7 +25,15 @@ Run the following commands
 
 ## /GAME
 
-this is where you should put your own game
+Game must have built option _"webGL"_
+
+To get all files you'll need run first `npm run prepare` \
+which will copy all necessary files into your game
+
+It will also push a template to be used by your build settings under the \
+`player settings`, locate and select _RTC_ in _Resolution and Presentation_
+
+When you build make sure to dump it into `/GAME/build` and now run `npm run prelease` to have your game under the product folder (which is your whole thing, should be fairly small)
 
 ## /WEB
 
