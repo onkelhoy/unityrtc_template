@@ -40,7 +40,7 @@ class Room {
     } else this.broadcast(user, { type: SocketTypes.Join, id: user.id } as SocketMessageJoin);
 
     this.users[id] = user;
-    sendTo(user, { type: SocketTypes.JoinAnswer, id, host: this.host } as SocketMessageJoinAnswer);
+    sendTo(user, { type: SocketTypes.JoinAnswer, id, host: this.host, room: this.name } as SocketMessageJoinAnswer);
   }
 
   leave(user:Socket) {

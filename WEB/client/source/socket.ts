@@ -58,11 +58,10 @@ class Socket {
         break;
       }
       case SocketTypes.JoinAnswer: {
-        const { id, host } = data as SocketMessageJoinAnswer;
+        const { id, host, room } = data as SocketMessageJoinAnswer;
         window.peerID = id;
-        window.host = host;
         window.UNITY.hostChange(host);
-        window.UNITY.setID(id);
+        window.UNITY.setID(id, room);
         break;
       }
       default:

@@ -13,13 +13,13 @@ declare global {
       error: (type:string, peer_id:string, error:string) => void;
       disconnect: (peer_id:string) => void;
       hostChange: (host:string) => void;
-      setID: (id:string) => void;
+      setID: (id:string, room:string) => void;
       socketError: (type:string, message:string) => void;
       answerError: (error:DOMException) => void;
+      newPeer: (id:string) => void;
     },
     unityInstance: UnityInstance; // this is assigned in template.html
     peerID:string;
-    host:string;
   }
 }
 
@@ -64,8 +64,12 @@ window.UNITY = {
     console.log(`hostChange : ${host}`);
     sendToUnity("hostChange", host);
   },
-  setID: (id) => {
-    console.log(`Set ID : ${id}`);
-    sendToUnity("setID", id);
+  setID: (id, room) => {
+    console.log(`Connected to Room ${room} with ID : ${id}`);
+    sendToUnity("setID", `${id}#${room}`);
   },
+  newPeer: (id) => {
+    console.log(`Incomming peer connection : ${id}`);
+    sendToUnity("newPeer", id);
+  } 
 };

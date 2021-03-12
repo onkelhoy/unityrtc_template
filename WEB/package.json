@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cp ./common.types.ts ./server/source/ && cd server && npm run build && cd .. && cp ./common.types.ts ./client/source && cd ./client && npm run build"
+    "prebuild": "cp ./common.types.ts ./server/source/ && cp ./common.types.ts ./client/source",
+    "build": "npm run prebuild && cd server && npm run build && cd ../client && npm run build"
   },
   "author": "",
   "license": "ISC"

@@ -33,8 +33,8 @@ mergeInto(LibraryManager.library, {
     window.RTC.terminate();
   },
 
-  farwell: function () {
-    window.RTC.farwell();
+  start: function () {
+    window.RTC.start();
   },
 
   create: function (room, password) {

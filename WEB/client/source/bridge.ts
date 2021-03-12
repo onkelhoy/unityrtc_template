@@ -28,6 +28,7 @@ class Bridge {
     this.peers = {};
     this.id = null;
 
+    // Socket also has some basic but this is a easy way to make new hooks
     this.socket.on(SocketTypes.Join, this._otherjoin);
     this.socket.on(SocketTypes.HostChange, this._hostChange);
     this.socket.on(SocketTypes.Offer, this._offer);
@@ -48,29 +49,32 @@ class Bridge {
     this.socket.close();
   }
   _hostChange = ({ host } : SocketMessageHostChange) => {
-    window.host = host;
     window.UNITY.hostChange(host);
   }
   _otherjoin = ({ id } : SocketMessageJoin) => {
-    if (!this.peers[id])
-      this.peers[id] = new Peer(this._socketsend, id, this._removePeer);
+    this._fromPeer(id);
     this.peers[id].createOffer(this._socketsend, id);
   }
   _offer = ({ from, offer } : SocketMessageOffer) => {
-    if (!this.peers[from])
-      this.peers[from] = new Peer(this._socketsend, from, this._removePeer);
+    this._fromPeer(from);
     this.peers[from].handleOffer(this._socketsend, offer);
   }
   _answer = ({ from, answer } : SocketMessageAnswer) => this.peers[from].handleAnswer(answer);
   _candidate = ({ from, candidate } : SocketMessageCandidate) => {
-    if (!this.peers[from])
-      this.peers[from] = new Peer(this._socketsend, from, this._removePeer);
+    this._fromPeer(from);
     this.peers[from].handleCandidate(candidate);
   }
   _removePeer = (id:string) => {
     this.peers[id].close();
     delete this.peers[id];
   }
+  _fromPeer = (id:string) => {
+    if (!this.peers[id]) {
+      this.peers[id] = new Peer(this._socketsend, id, this._removePeer);
+      window.UNITY.newPeer(id);
+    }
+  }
+
 
 
   // sending
@@ -104,7 +108,7 @@ class Bridge {
       this._removePeer(id);
     }
   }
-  farwell () {
+  start () {
     this.socket.send({ type: SocketTypes.Farwell });
   }
 }

@@ -3,7 +3,11 @@ using System.Runtime.InteropServices;
 
 public class RTC : MonoBehaviour
 {
-  public Transform player;
+  public static string ROOM;
+  public static string USER;
+  public static string HOST;
+
+  public static HashSet<string> PEERS = new HashSet<string>();
 
   [DllImport("__Internal")]
   public static extern int send(string to, string message, string[] channels);
@@ -18,7 +22,7 @@ public class RTC : MonoBehaviour
   public static extern void terminate();
 
   [DllImport("__Internal")]
-  public static extern void farwell();
+  public static extern void Start();
 
   [DllImport("__Internal")]
   public static extern void create(string room, string password);
@@ -71,12 +75,19 @@ public class RTC : MonoBehaviour
 
   public void hostChange(string host)
   {
+    RTC.HOST = host;
     Debug.Log(string.Format("hostChange : {0}", host));
   }
 
-  public void setID(string id)
+  public void setID(string strmessage)
   {
-    Debug.Log(string.Format("Set ID : {0}", id));
+    string[] split = strmessage.Split('#');
+    string id = split[0];
+    string room = split[1];
+
+    RTC.USER = id;
+    RTC.ROOM = room;
+    Debug.Log(string.Format("Connected to Room {0} with ID : {1}", room, id));
   }
 
   public void socketError(string strmessage)
