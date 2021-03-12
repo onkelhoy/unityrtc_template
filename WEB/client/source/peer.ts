@@ -168,7 +168,7 @@ class Peer {
 
         send({ type: SocketTypes.Answer, answer, to: this.remote, from: window.peerID } as SocketRequestAnswer);
       })
-      .catch((error) => {
+      .catch((error:DOMException) => {
         window.UNITY.answerError(error);
       });
   }

@@ -48,5 +48,7 @@ mergeInto(LibraryManager.library, {
     window.RTC.connect(room, password);
   },
 
-  
+  unityToWeb: function(message, a, b) {
+    window.unityToWeb(message, a, b)
+  }
 });

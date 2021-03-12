@@ -1,4 +1,5 @@
 import Bridge from './bridge';
+import { UnityInstance } from './types';
 
 // unityInstance = UnityLoader.instantiate("unityContainer", "Build/build.json", {onProgress: UnityProgress});
 
@@ -14,41 +15,66 @@ declare global {
       hostChange: (host:string) => void;
       setID: (id:string) => void;
       socketError: (type:string, message:string) => void;
-      answerError: (error:any) => void; // cant figure out what type error is, should check docs
+      answerError: (error:DOMException) => void;
+      webToUnity: (msg:string) => void;
     },
+    unityInstance: UnityInstance; // this is assigned in template.html
     peerID:string;
     host:string;
+    unityToWeb:(message:string, a:string, b:string) => void;
   }
 }
 
 window.RTC = new Bridge();
 
+function sendToUnity(method:string, message:string):void {
+  if (window.unityInstance) {
+    window.unityInstance.SendMessage("RTC", method, message);
+  }
+}
+
+window.unityToWeb = function (m, a, b) {
+  console.log(`message: ${m}, a: ${a}, b: ${b}`)
+}
+
 window.UNITY = {
   socketError: (type, message) => {
-    console.error('socker-error', type, message);
+    console.error(`socketError type: ${type}, message: ${message}`);
+    sendToUnity("socketError", message);
   },
   answerError: (error) => {
-    console.error('answer error', error);
+    console.log(`answerError : ${error.message}`);
+    sendToUnity("answerError", error.message);
   },
   connectionUpdate: (id, state) => {
-    console.log("state update", id, state);
+    console.log(`connectionUpdate id: ${id}, state: ${state}`);
+    sendToUnity("connectionUpdate", `${id}#${state}`);
   },
-  message: (channel, peer_id, msg) => {
-    console.log(`new message from ${peer_id} on ${channel}: ${msg}`);
+  message: (channel, peer_id, message) => {
+    console.log(`message channel: ${channel} peer_id: ${peer_id}, message: ${message}`);
+    sendToUnity("message", `${peer_id}#${channel}#${message}`);
   },
   error: (type, peer_id, error) => {
-    console.log("oh no, error!", peer_id, type, error);
+    console.log(`error type: ${type} peer_id: ${peer_id} error: ${error}`);
+    sendToUnity("error", `${type}#${peer_id}#${error}`);
   },
   channelUpdate: (label, state) => {
-    console.log("new update for channel", label, state);
+    console.log(`channelUpdate label: ${label} state: ${state}`);
+    sendToUnity("channelUpdate", `${label}#${state}`);
   },
   disconnect: (peer_id) => {
-    console.log("peer disonnect", peer_id);
+    console.log(`disconnected peer id: ${peer_id}`);
+    sendToUnity("disconnect", peer_id);
   },
   hostChange: (host) => {
-    console.log('new host', host);
+    console.log(`hostChange : ${host}`);
+    sendToUnity("hostChange", host);
   },
   setID: (id) => {
-    console.log('ID set', id);
+    console.log(`Set ID : ${id}`);
+    sendToUnity("setID", id);
+  },
+  webToUnity: (msg) => {
+    sendToUnity("webToUnity", msg);
   }
 };
