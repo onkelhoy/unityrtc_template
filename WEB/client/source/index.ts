@@ -16,12 +16,10 @@ declare global {
       setID: (id:string) => void;
       socketError: (type:string, message:string) => void;
       answerError: (error:DOMException) => void;
-      webToUnity: (msg:string) => void;
     },
     unityInstance: UnityInstance; // this is assigned in template.html
     peerID:string;
     host:string;
-    unityToWeb:(message:string, a:string, b:string) => void;
   }
 }
 
@@ -31,10 +29,6 @@ function sendToUnity(method:string, message:string):void {
   if (window.unityInstance) {
     window.unityInstance.SendMessage("RTC", method, message);
   }
-}
-
-window.unityToWeb = function (m, a, b) {
-  console.log(`message: ${m}, a: ${a}, b: ${b}`)
 }
 
 window.UNITY = {
@@ -74,7 +68,4 @@ window.UNITY = {
     console.log(`Set ID : ${id}`);
     sendToUnity("setID", id);
   },
-  webToUnity: (msg) => {
-    sendToUnity("webToUnity", msg);
-  }
 };

@@ -6,7 +6,11 @@ mergeInto(LibraryManager.library, {
     * channels:string|string[]
     */
 
-    window.RTC.send(to, message, channels);
+    window.RTC.send(
+      Pointer_stringify(to), 
+      Pointer_stringify(message), 
+      Pointer_stringify(channels)
+    );
   },
 
   broadcast: function (message, channels) {
@@ -15,7 +19,10 @@ mergeInto(LibraryManager.library, {
     * channels:string|string[]
     */
 
-    window.RTC.broadcast(message, channels);
+    window.RTC.broadcast(
+      Pointer_stringify(message), 
+      Pointer_stringify(channels)
+    );
   },
 
   terminateSocket: function () {
@@ -36,7 +43,10 @@ mergeInto(LibraryManager.library, {
     * password:string
     */
 
-    window.RTC.create(room, password);
+    window.RTC.create(
+      Pointer_stringify(room), 
+      Pointer_stringify(password)
+    );
   },
 
   connect: function (room, password) {
@@ -45,10 +55,9 @@ mergeInto(LibraryManager.library, {
     * password:string
     */
 
-    window.RTC.connect(room, password);
+    window.RTC.connect(
+      Pointer_stringify(room), 
+      Pointer_stringify(password)
+    );
   },
-
-  unityToWeb: function(message, a, b) {
-    window.unityToWeb(message, a, b)
-  }
 });
