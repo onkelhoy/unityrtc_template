@@ -15,8 +15,9 @@ declare global {
       hostChange: (host:string) => void;
       setID: (id:string, room:string) => void;
       socketError: (type:string, message:string) => void;
-      answerError: (error:DOMException) => void;
-      newPeer: (id:string) => void;
+      answerError: (peer_id:string, error:DOMException) => void;
+      newPeer: (peer_id:string) => void;
+      start: (timestamp:string) => void;
     },
     unityInstance: UnityInstance; // this is assigned in template.html
     peerID:string;
@@ -36,9 +37,9 @@ window.UNITY = {
     console.error(`socketError type: ${type}, message: ${message}`);
     sendToUnity("socketError", message);
   },
-  answerError: (error) => {
-    console.log(`answerError : ${error.message}`);
-    sendToUnity("answerError", error.message);
+  answerError: (peer_id, error) => {
+    console.log(`Answer Error from : ${peer_id} - ${error.message}`);
+    sendToUnity("answerError", `${peer_id}#${error.message}`);
   },
   connectionUpdate: (id, state) => {
     console.log(`connectionUpdate id: ${id}, state: ${state}`);
@@ -68,8 +69,12 @@ window.UNITY = {
     console.log(`Connected to Room ${room} with ID : ${id}`);
     sendToUnity("setID", `${id}#${room}`);
   },
-  newPeer: (id) => {
-    console.log(`Incomming peer connection : ${id}`);
-    sendToUnity("newPeer", id);
-  } 
+  newPeer: (peer_id) => {
+    console.log(`Incomming peer connection : ${peer_id}`);
+    sendToUnity("newPeer", peer_id);
+  },
+  start: (timestamp) => {
+    console.log(`Starting game ${timestamp}`);
+    sendToUnity("start", timestamp);
+  }
 };

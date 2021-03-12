@@ -45,7 +45,8 @@ class Bridge {
   _onerror = ({ message, type } : SocketMessageError) => {
     window.UNITY.socketError(type, message);
   }
-  _farwell = () => {
+  _farwell = (timestamp:string) => {
+    window.UNITY.start(timestamp);
     this.socket.close();
   }
   _hostChange = ({ host } : SocketMessageHostChange) => {

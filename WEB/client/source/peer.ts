@@ -169,7 +169,7 @@ class Peer {
         send({ type: SocketTypes.Answer, answer, to: this.remote, from: window.peerID } as SocketRequestAnswer);
       })
       .catch((error:DOMException) => {
-        window.UNITY.answerError(error);
+        window.UNITY.answerError(this.remote, error);
       });
   }
 

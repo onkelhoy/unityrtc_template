@@ -1,13 +1,16 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 public class RTC : MonoBehaviour
 {
   public static string ROOM;
-  public static string USER;
+  public static string ID;
   public static string HOST;
-
   public static HashSet<string> PEERS = new HashSet<string>();
+
+  public MainMenu mainMenu;
+  public LobbyMenu lobbyMenu;
 
   [DllImport("__Internal")]
   public static extern int send(string to, string message, string[] channels);
@@ -22,7 +25,7 @@ public class RTC : MonoBehaviour
   public static extern void terminate();
 
   [DllImport("__Internal")]
-  public static extern void Start();
+  public static extern void Start(string timestamp);
 
   [DllImport("__Internal")]
   public static extern void create(string room, string password);
@@ -70,6 +73,7 @@ public class RTC : MonoBehaviour
 
   public void disconnect(string peer_id)
   {
+    RTC.PEERS.Remove(peer_id);
     Debug.Log(string.Format("disconnected peer id: {0}", peer_id));
   }
 
@@ -85,7 +89,7 @@ public class RTC : MonoBehaviour
     string id = split[0];
     string room = split[1];
 
-    RTC.USER = id;
+    RTC.ID = id;
     RTC.ROOM = room;
     Debug.Log(string.Format("Connected to Room {0} with ID : {1}", room, id));
   }
@@ -93,14 +97,40 @@ public class RTC : MonoBehaviour
   public void socketError(string strmessage)
   {
     string[] split = strmessage.Split('#');
-    string type = split[0];
+    string type = split[0]; // join, room, host
     string message = split[1];
+
+    switch (type)
+    {
+      case "host":
+        lobbyMenu.showError(message);
+        break;
+      case "join":
+      case "room":
+        mainMenu.showError(message);
+        break;
+    }
 
     Debug.Log(string.Format("socketError type: {0}, message: {1}", type, message));
   }
 
-  public void answerError(string error)
+  public void answerError(string strmessage)
   {
-    Debug.Log(string.Format("answerError : {0}", error));
+    string[] split = strmessage.Split('#');
+    string peer_id = split[0];
+    string error = split[1];
+
+    Debug.Log(string.Format("Answer Error from : {0} - {1}", peer_id, error));
+  }
+
+  public void newPeer(string peer_id)
+  {
+    Debug.Log(string.Format("Incomming peer connection : {0}", peer_id));
+    RTC.PEERS.Add(peer_id);
+  }
+
+  public void start(string timestamp)
+  {
+    Debug.Log(string.Format("Starting game {0}", timestamp));
   }
 }
