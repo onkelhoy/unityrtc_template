@@ -7,18 +7,20 @@ declare global {
   interface Window { 
     RTC: Bridge; 
     UNITY: {
-      connectionUpdate: (id:string, state:RTCPeerConnectionState) => void;
-      channelUpdate: (label:string, state:RTCPeerConnectionState) => void;
       message: (channel:string, peer_id:string, msg:string) => void;
       error: (type:string, peer_id:string, error:string) => void;
       disconnect: (peer_id:string) => void;
       hostChange: (host:string) => void;
+      start: (timestamp:string) => void;
+    },
+    WEB: {
+      connectionUpdate: (id:string, state:RTCPeerConnectionState) => void;
+      channelUpdate: (label:string, state:RTCPeerConnectionState) => void;
       setID: (id:string, room:string) => void;
       socketError: (type:string, message:string) => void;
       answerError: (peer_id:string, error:DOMException) => void;
       newPeer: (peer_id:string) => void;
-      start: (timestamp:string) => void;
-    },
+    }
     unityInstance: UnityInstance; // this is assigned in template.html
     peerID:string;
   }
@@ -32,19 +34,34 @@ function sendToUnity(method:string, message:string):void {
   }
 }
 
-window.UNITY = {
+window.WEB = {
   socketError: (type, message) => {
     console.error(`socketError type: ${type}, message: ${message}`);
-    sendToUnity("socketError", message);
+    // sendToUnity("socketError", message);
   },
   answerError: (peer_id, error) => {
     console.log(`Answer Error from : ${peer_id} - ${error.message}`);
-    sendToUnity("answerError", `${peer_id}#${error.message}`);
+    // sendToUnity("answerError", `${peer_id}#${error.message}`);
   },
   connectionUpdate: (id, state) => {
     console.log(`connectionUpdate id: ${id}, state: ${state}`);
-    sendToUnity("connectionUpdate", `${id}#${state}`);
+    // sendToUnity("connectionUpdate", `${id}#${state}`);
   },
+  channelUpdate: (label, state) => {
+    console.log(`channelUpdate label: ${label} state: ${state}`);
+    // sendToUnity("channelUpdate", `${label}#${state}`);
+  },
+  setID: (id, room) => {
+    console.log(`Connected to Room ${room} with ID : ${id}`);
+    // sendToUnity("setID", `${id}#${room}`);
+  },
+  newPeer: (peer_id) => {
+    console.log(`Incomming peer connection : ${peer_id}`);
+    // sendToUnity("newPeer", peer_id);
+  },
+}
+
+window.UNITY = {
   message: (channel, peer_id, message) => {
     console.log(`message channel: ${channel} peer_id: ${peer_id}, message: ${message}`);
     sendToUnity("message", `${peer_id}#${channel}#${message}`);
@@ -52,10 +69,6 @@ window.UNITY = {
   error: (type, peer_id, error) => {
     console.log(`error type: ${type} peer_id: ${peer_id} error: ${error}`);
     sendToUnity("error", `${type}#${peer_id}#${error}`);
-  },
-  channelUpdate: (label, state) => {
-    console.log(`channelUpdate label: ${label} state: ${state}`);
-    sendToUnity("channelUpdate", `${label}#${state}`);
   },
   disconnect: (peer_id) => {
     console.log(`disconnected peer id: ${peer_id}`);
@@ -65,16 +78,8 @@ window.UNITY = {
     console.log(`hostChange : ${host}`);
     sendToUnity("hostChange", host);
   },
-  setID: (id, room) => {
-    console.log(`Connected to Room ${room} with ID : ${id}`);
-    sendToUnity("setID", `${id}#${room}`);
-  },
-  newPeer: (peer_id) => {
-    console.log(`Incomming peer connection : ${peer_id}`);
-    sendToUnity("newPeer", peer_id);
-  },
   start: (timestamp) => {
     console.log(`Starting game ${timestamp}`);
-    sendToUnity("start", timestamp);
+    sendToUnity("start", `${timestamp}#${Object.keys(window.RTC.peers).join()}`);
   }
 };
