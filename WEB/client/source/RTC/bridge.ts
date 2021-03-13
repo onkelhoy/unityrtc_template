@@ -43,14 +43,14 @@ class Bridge {
   }
 
   _onerror = ({ message, type } : SocketMessageError) => {
-    window.UNITY.socketError(type, message);
+    window.WEB.socketError(type, message);
   }
   _farwell = (timestamp:string) => {
     window.UNITY.start(timestamp);
     this.socket.close();
   }
   _hostChange = ({ host } : SocketMessageHostChange) => {
-    window.UNITY.hostChange(host);
+    window.WEB.hostChange(host);
   }
   _otherjoin = ({ id } : SocketMessageJoin) => {
     this._fromPeer(id);
@@ -72,7 +72,7 @@ class Bridge {
   _fromPeer = (id:string) => {
     if (!this.peers[id]) {
       this.peers[id] = new Peer(this._socketsend, id, this._removePeer);
-      window.UNITY.newPeer(id);
+      window.WEB.newPeer(id);
     }
   }
 

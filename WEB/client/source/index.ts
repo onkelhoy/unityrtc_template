@@ -8,9 +8,7 @@ declare global {
     RTC: Bridge; 
     UNITY: {
       message: (channel:string, peer_id:string, msg:string) => void;
-      error: (type:string, peer_id:string, error:string) => void;
       disconnect: (peer_id:string) => void;
-      hostChange: (host:string) => void;
       start: (timestamp:string) => void;
     },
     WEB: {
@@ -19,6 +17,8 @@ declare global {
       setID: (id:string, room:string) => void;
       socketError: (type:string, message:string) => void;
       answerError: (peer_id:string, error:DOMException) => void;
+      error: (type:string, peer_id:string, error:string) => void;
+      hostChange: (host:string) => void;
       newPeer: (peer_id:string) => void;
     }
     unityInstance: UnityInstance; // this is assigned in template.html
@@ -59,6 +59,14 @@ window.WEB = {
     console.log(`Incomming peer connection : ${peer_id}`);
     // sendToUnity("newPeer", peer_id);
   },
+  error: (type, peer_id, error) => {
+    console.log(`error type: ${type} peer_id: ${peer_id} error: ${error}`);
+    sendToUnity("error", `${type}#${peer_id}#${error}`);
+  },
+  hostChange: (host) => {
+    console.log(`hostChange : ${host}`);
+    sendToUnity("hostChange", host);
+  },
 }
 
 window.UNITY = {
@@ -66,17 +74,9 @@ window.UNITY = {
     console.log(`message channel: ${channel} peer_id: ${peer_id}, message: ${message}`);
     sendToUnity("message", `${peer_id}#${channel}#${message}`);
   },
-  error: (type, peer_id, error) => {
-    console.log(`error type: ${type} peer_id: ${peer_id} error: ${error}`);
-    sendToUnity("error", `${type}#${peer_id}#${error}`);
-  },
   disconnect: (peer_id) => {
     console.log(`disconnected peer id: ${peer_id}`);
     sendToUnity("disconnect", peer_id);
-  },
-  hostChange: (host) => {
-    console.log(`hostChange : ${host}`);
-    sendToUnity("hostChange", host);
   },
   start: (timestamp) => {
     console.log(`Starting game ${timestamp}`);

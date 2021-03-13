@@ -51,7 +51,7 @@ class Peer {
     //   console.log("ICE gathering state");
     // };
     pc.onicecandidateerror = (error) =>
-      window.UNITY.error("ice", this.remote, error.errorText);
+      window.WEB.error("ice", this.remote, error.errorText);
 
     // pc.oniceconnectionstatechange = (evt) => {
     //   console.log("ICE state change", evt);
@@ -80,7 +80,7 @@ class Peer {
 
   ConnectionStateChange() {
     // must exist
-    window.UNITY.connectionUpdate(this.remote, this.connection.connectionState);
+    window.WEB.connectionUpdate(this.remote, this.connection.connectionState);
 
     switch (this.connection.connectionState) {
       case "closed":
@@ -122,20 +122,20 @@ class Peer {
       this.channels[label].queue = [];
     }
 
-    window.UNITY.channelUpdate(label, "connected");
+    window.WEB.channelUpdate(label, "connected");
   }
 
   onChannelClose(label:string) {
-    window.UNITY.channelUpdate(label, "closed");
+    window.WEB.channelUpdate(label, "closed");
   }
 
   onChannelMessage(name:string, event: MessageEvent) {
-    window.UNITY.message(name, this.remote, event.data);
+    window.WEB.message(name, this.remote, event.data);
   }
 
   onChannelError(name:string, event:RTCErrorEvent) {
-    window.UNITY.channelUpdate(name, "failed");
-    window.UNITY.error("channel", name, event.error.message);
+    window.WEB.channelUpdate(name, "failed");
+    window.WEB.error("channel", name, event.error.message);
   }
 
   createOffer(send:SendFunction, from:string) {
@@ -169,7 +169,7 @@ class Peer {
         send({ type: SocketTypes.Answer, answer, to: this.remote, from: window.peerID } as SocketRequestAnswer);
       })
       .catch((error:DOMException) => {
-        window.UNITY.answerError(this.remote, error);
+        window.WEB.answerError(this.remote, error);
       });
   }
 
