@@ -7,6 +7,7 @@
     "start": "node product/index.js",
     "prepare": "cd scripts/ && sh prepare.sh",
     "prelease": "cd scripts/ && sh prelease.sh",
+    "prebuild": "cd scripts/ && sh prebuild.sh",
     "buildstart": "npm run b:web && npm run start"
   },
   "repository": {

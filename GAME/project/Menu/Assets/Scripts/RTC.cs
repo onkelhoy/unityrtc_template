@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
@@ -32,6 +32,26 @@ public class RTC : MonoBehaviour
 
     [DllImport("__Internal")]
     public static extern void connect(string room, string password);
+
+    // helper function to send BaseMessages
+    public static void Send(string to, CollectionMessage message)
+    {
+        RTC.Send(to, message, new string[0]);
+    }
+    public static void Send(string to, CollectionMessage message, string[] channels)
+    {
+        string msg = message.Stringify();
+        RTC.send(to, msg, channels);
+    }
+    public static void Broadcast(CollectionMessage message)
+    {
+        RTC.Broadcast(message, new string[0]);
+    }
+    public static void Broadcast(CollectionMessage message, string[] channels)
+    {
+        string msg = message.Stringify();
+        RTC.broadcast(msg, channels);
+    }
 
     public void connectionUpdate(string strmessage)
     {
@@ -132,6 +152,5 @@ public class RTC : MonoBehaviour
     public void start(string timestamp)
     {
         Debug.Log(string.Format("Starting game {0}", timestamp));
-        lobbyMenu.StartGame(timestamp);
     }
 }

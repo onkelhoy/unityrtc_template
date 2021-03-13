@@ -1,4 +1,4 @@
-import Bridge from './bridge';
+import Bridge from './RTC/bridge';
 import { UnityInstance } from './types';
 
 // unityInstance = UnityLoader.instantiate("unityContainer", "Build/build.json", {onProgress: UnityProgress});

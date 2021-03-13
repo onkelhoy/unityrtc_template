@@ -31,8 +31,3 @@ cp ../Static/RTC.jslib $plugin_target
 
 # copy script files
 cp ../Static/RTC.cs $scripts_target
-
-
-# create the menu
-cp ../Static/LobbyMenu.cs $scripts_target/Menu
-cp ../Static/MainMenu.cs $scripts_target/Menu

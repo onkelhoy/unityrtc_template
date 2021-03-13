@@ -4,8 +4,8 @@ import { 
   SocketTypes,
   SocketMessageLeave,
   SocketMessageJoinAnswer,
-} from './common.types';
-import { SocketEvents } from './types';
+} from '../common.types';
+import { SocketEvents } from '../types';
 
 class Socket {
   ws:WebSocket;

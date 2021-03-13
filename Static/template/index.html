@@ -17,7 +17,33 @@
   </head>
   
   <body>
-    <div id="unityContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px; margin: auto"></div>
+    <section className="menu">
+      <div className="main">
+        <h1>UnityRTC Template</h1>
+        <span className="error"></span>
+
+        <label for="room">Room</label>
+        <input id="room" name="room" type="text" placeholder="Example Name" />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="Optional Password" />
+
+        <button id="connect" onClick={window.Connect()}>Connect</button>
+        <button id="create" onClick={window.Create()}>Create</button>
+      </div>
+      <div className="lobby">
+        <h1>Lobby <span id="roomName">ROOM</span></h1>
+
+        <ul id="peers">
+          <li className="you">YOU</li>
+        </ul>
+
+        <button id="start" disabled>Start Game</button>
+      </div>
+    </section>
+    <section className="game">
+      <div id="unityContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px; margin: auto"></div>
+    </section>
   </body>
   
 </html>
