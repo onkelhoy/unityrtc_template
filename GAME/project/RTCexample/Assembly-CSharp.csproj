@@ -64,7 +64,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Player.cs" />
-    <Compile Include="Assets\Scripts\RTC.cs" />
+    <Compile Include="Assets\Scripts\RTC\Message.cs" />
+    <Compile Include="Assets\Scripts\RTC\Start.cs" />
+    <Compile Include="Assets\Scripts\RTC\WEB.cs" />
     <Reference Include="UnityEngine">
       <HintPath>/Applications/Unity/Hub/Editor/2019.4.12f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

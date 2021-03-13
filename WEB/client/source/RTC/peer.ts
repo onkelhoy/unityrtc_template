@@ -5,7 +5,7 @@ import {
 
   SocketTypes
 } from '../common.types';
-import { SendFunction } from '../types';
+import { ErrorType, SendFunction } from '../types';
 
 interface Channel {
   channel:RTCDataChannel,
@@ -43,7 +43,7 @@ class Peer {
           type: SocketTypes.Candidate,
           candidate: event.candidate,
           to: this.remote,
-          from: window.peerID
+          from: window.ID
         } as SocketRequestCandidate);
       }
     };
@@ -51,7 +51,7 @@ class Peer {
     //   console.log("ICE gathering state");
     // };
     pc.onicecandidateerror = (error) =>
-      window.WEB.error("ice", this.remote, error.errorText);
+      window.WEB.error(ErrorType.ICE, this.remote, error.errorText);
 
     // pc.oniceconnectionstatechange = (evt) => {
     //   console.log("ICE state change", evt);
@@ -130,12 +130,12 @@ class Peer {
   }
 
   onChannelMessage(name:string, event: MessageEvent) {
-    window.WEB.message(name, this.remote, event.data);
+    window.UNITY.message(name, this.remote, event.data);
   }
 
   onChannelError(name:string, event:RTCErrorEvent) {
     window.WEB.channelUpdate(name, "failed");
-    window.WEB.error("channel", name, event.error.message);
+    window.WEB.error(ErrorType.Channel, name, event.error.message);
   }
 
   createOffer(send:SendFunction, from:string) {
@@ -146,7 +146,7 @@ class Peer {
     return this.connection
       .createOffer()
       .then((offer) => {
-        send({ type: SocketTypes.Offer, to: from, from: window.peerID, offer } as SocketRequestOffer);
+        send({ type: SocketTypes.Offer, to: from, from: window.ID, offer } as SocketRequestOffer);
 
         this.connection.setLocalDescription(offer);
       })
@@ -166,7 +166,7 @@ class Peer {
       .then((answer) => {
         this.connection.setLocalDescription(answer);
 
-        send({ type: SocketTypes.Answer, answer, to: this.remote, from: window.peerID } as SocketRequestAnswer);
+        send({ type: SocketTypes.Answer, answer, to: this.remote, from: window.ID } as SocketRequestAnswer);
       })
       .catch((error:DOMException) => {
         window.WEB.answerError(this.remote, error);
