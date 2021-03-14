@@ -24,6 +24,7 @@ export interface IUnityInstance {
   }
   url:string;
   onProgress: UnityOnProgress;
+  SetFullscreen:Function;
 }
 
 export type UnityOnProgress = (unityInstance: IUnityInstance, progress: number) => void;

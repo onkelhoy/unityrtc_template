@@ -8,9 +8,10 @@ cd ..
 npm run b:web
 cd ./scripts
 
-# Moving build into public 
-#   extract name
-build=`ls ../GAME/build/`
+# Moving builds into public 
+list=$(find ../GAME/build -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
 
-#   move build to correct folder
-cp -R ../GAME/build/${build}/ ../product/public
+
+for i in $list; do # Whitespace-safe but not recursive.
+  cp -R ../GAME/build/${i}/Build ../product/public/$i
+done
