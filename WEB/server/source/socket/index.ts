@@ -28,7 +28,8 @@ const rooms:{[key:string]: Room} = {};
 const wss = new WebSocket.Server({ noServer: true });
 
 wss.on("connection", function (user:Socket) {
-  user.on("message", onMessage.bind(user)); // binding just so ts can shutup..
+  user.on("message", onMessage.bind(user));
+  user.on('close', onClose.bind(user));
 });
 
 function onMessage(this:Socket, message: string) {
@@ -50,8 +51,14 @@ function onMessage(this:Socket, message: string) {
       return create(user, data as SocketRequestCreate);
     case SocketTypes.Farwell:
       return farwell(user);
+    case SocketTypes.HeartBeat:
+      return heartbeat(user);
   }
 }
+
+function onClose(this:Socket) {
+  leave(this);
+} 
 
 function roomCheck(user:Socket, cb:Function) {
   const { room } = user;
@@ -66,11 +73,16 @@ function roomCheck(user:Socket, cb:Function) {
   }
 }
 
+function heartbeat(user:Socket) {
+  user.heartbeat = Date.now();
+}
 
 function farwell(user:Socket) {
   roomCheck(user, () => {
-    if (rooms[user.room].farwell(user))
+    if (rooms[user.room].farwell(user)) {
       delete rooms[user.room];
+      console.log('room deleted', user.room);
+    } 
   });
 }
 

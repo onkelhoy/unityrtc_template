@@ -23,6 +23,8 @@ class Room {
     this.users = {};
     this.count = 0;
     this.host = null;
+
+    console.log('creating room', name)
   }
 
   join(user:Socket, password:string):void {
@@ -47,6 +49,8 @@ class Room {
     this.users[user.id].close();
     delete this.users[user.id];
     // notify all in room
+
+    console.log('socket left');
     this.count--;
     if (this.count > 0) {
       this.broadcast(user, { type: SocketTypes.Leave, id: user.id } as SocketMessageLeave);

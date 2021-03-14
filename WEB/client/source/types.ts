@@ -14,3 +14,8 @@ export enum ErrorType {
   ICE = "ice",
   Channel = "channel",
 }
+
+export enum MODE {
+  MENU,
+  GAME
+}

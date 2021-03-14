@@ -42,10 +42,12 @@ class Bridge {
     this._socketsend = this.socket.send.bind(this.socket);
   }
 
-  _onerror = ({ message, type } : SocketMessageError) => {
-    window.WEB.socketError(type, message);
+  _onerror = ({ message, error } : SocketMessageError) => {
+    window.WEB.socketError(error, message);
   }
   _farwell = (timestamp:string) => {
+    // SECTION GAME-START 
+    window.UI.start(timestamp);
     window.UNITY.start(timestamp);
     this.socket.close();
   }
@@ -76,21 +78,6 @@ class Bridge {
     }
   }
 
-
-
-  // sending
-  send(to:string, message:string, channels:string|string[]) {
-    if (!this.peers[to]) return false;
-
-    this.peers[to].send(message, channels);
-    return true;
-  }
-  broadcast(message:string, channels:string|string[]) {
-    for (const peer in this.peers) {
-      this.peers[peer].send(message, channels);
-    }
-  }
-
   // room
   create(room:string, password:string) {
     this.socket.send({ type: SocketTypes.Create, room, password } as SocketRequestCreate);
@@ -103,14 +90,34 @@ class Bridge {
   terminateSocket() { 
     this.socket.close();
   }
-  terminate () {
+
+  systemSend(message:string) {
+    for (const peer in this.peers) {
+      this.peers[peer].systemSend(message);
+    }
+  }
+  
+  start () {
+    this.socket.send({ type: SocketTypes.Farwell });
+  }
+
+  // UNITY-TO-WEB
+  send(to:string, message:string, channels:string|string[]) {
+    if (!this.peers[to]) return false;
+
+    this.peers[to].send(message, channels);
+    return true;
+  }
+  broadcast(message:string, channels:string|string[]) {
+    for (const peer in this.peers) {
+      this.peers[peer].send(message, channels);
+    }
+  }
+  disconnect () {
     this.socket.close();
     for (const id in this.peers) {
       this._removePeer(id);
     }
-  }
-  start () {
-    this.socket.send({ type: SocketTypes.Farwell });
   }
 }
 

@@ -26,6 +26,6 @@
   },
 
   Disconnect: function () {
-    window.RTC.Disconnect();
+    window.RTC.disconnect();
   },
 });

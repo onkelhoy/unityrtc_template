@@ -14,12 +14,11 @@ interface Channel {
 
 class Peer {
   remote:string;
-  channelSchema:[string];
   connection:webkitRTCPeerConnection;
   channels:{[key:string]:Channel};
   close:Function;
 
-  constructor(send:SendFunction, remote:string, close:Function, channels:[string] = ["default"]) {
+  constructor(send:SendFunction, remote:string, close:Function) {
     const configuration = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -61,7 +60,6 @@ class Peer {
     pc.ondatachannel = this.onDataChannel.bind(this);
 
     this.remote = remote;
-    this.channelSchema = channels;
     this.channels = {};
     this.close = close;
     this.kill = this.kill.bind(this);
@@ -130,7 +128,12 @@ class Peer {
   }
 
   onChannelMessage(name:string, event: MessageEvent) {
-    window.UNITY.message(name, this.remote, event.data);
+    if (name !== window.PEER.system) {
+      window.UNITY.message(name, this.remote, event.data);
+    }
+    else {
+      window.PEER.peerMessage(this.remote, event);
+    }
   }
 
   onChannelError(name:string, event:RTCErrorEvent) {
@@ -139,9 +142,11 @@ class Peer {
   }
 
   createOffer(send:SendFunction, from:string) {
-    for (const c of this.channelSchema) {
+    for (const c of window.PEER.channels) {
       this.createChannel(c);
     }
+
+    this.createChannel(window.PEER.system);
 
     return this.connection
       .createOffer()
@@ -187,6 +192,15 @@ class Peer {
     this.close();
   }
 
+  systemSend(message:string) {
+    if (this.channels[window.PEER.system].channel.readyState === "open") {
+      this.channels[window.PEER.system].channel.send(message);
+    } else {
+      // store if for later
+      this.channels[window.PEER.system].queue.push(message);
+    }
+  }
+
   send(message:string, channels:string[]|string) {
     if (typeof channels === "string") {
       channels = [channels];
@@ -195,9 +209,8 @@ class Peer {
       channels = Object.keys(this.channels);
     }
 
-    // console.log("sending message", message, channels);
-
     for (const label of channels) {
+      if (label !== window.PEER.system)
       if (this.channels[label].channel.readyState === "open") {
         this.channels[label].channel.send(message);
       } else {

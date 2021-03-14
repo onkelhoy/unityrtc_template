@@ -54,14 +54,14 @@ class Socket {
         return this.error(data as SocketMessageError);
       case SocketTypes.Leave: {
         const { id } = data as SocketMessageLeave;
-        window.UNITY.disconnect(id);
+        window.UI.disconnect(id);
         break;
       }
       case SocketTypes.JoinAnswer: {
         const { id, host, room } = data as SocketMessageJoinAnswer;
         window.ID = id;
-        window.UNITY.hostChange(host);
-        window.UNITY.setID(id, room);
+        window.WEB.hostChange(host);
+        window.WEB.setID(id, room);
         break;
       }
       default:

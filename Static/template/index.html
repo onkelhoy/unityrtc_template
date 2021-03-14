@@ -23,7 +23,7 @@
     <section class="menu active">
       <div class="main active">
         <h1 class="center">UnityRTC Template</h1>
-        <span class="error"></span>
+        <span id="mainerror" class="error"></span>
 
         <div class="field">
           <label for="room">Room</label>
@@ -33,17 +33,17 @@
           <label for="password">Password</label>
           <input id="password" name="password" type="password" placeholder="Optional Password" />
         </div>
-        <div class="connect"><button onClick={window.Connect()}>Connect</button></div>
-        <div class="create"><button onClick={window.Create()}>Create</button></div>
+        <div class="connect"><button onClick={window.UI.Connect()}>Connect</button></div>
+        <div class="create"><button onClick={window.UI.Create()}>Create</button></div>
       </div>
       <div class="lobby">
         <h1 class="center">Lobby <span id="roomName">ROOM</span></h1>
-        <span class="error"></span>
+        <span id="lobbyerror" class="error"></span>
 
         <ul id="peers">
           <li class="you">YOU</li>
         </ul>
-        <div class="create"><button disabled>Start Game</button></div>
+        <div class="create"><button id="start" onClick={window.RTC.start()} disabled>Start Game</button></div>
       </div>
     </section>
     <section class="loading center">
