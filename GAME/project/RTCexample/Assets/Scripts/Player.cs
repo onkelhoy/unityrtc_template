@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public Color color { get; set; }
+    public string ID { get; set; }
 
     // Start is called before the first frame update
     void Start()
@@ -13,13 +13,19 @@ public class Player : MonoBehaviour
 
         Material newMaterial = new Material(Shader.Find("Standard"));
 
-        newMaterial.color = color;
+        newMaterial.color = WEB.HOST == WEB.ID ? new Color(1, 0, 0) : new Color(0, 0, 1);
         gameObjectRenderer.material = newMaterial;
+
+        WEB.onMessage += WEB_onMessage;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void WEB_onMessage(PeerMessage obj)
     {
+        if (obj.Content.Type == PeerMessageType.ASSIGN)
+        {
+            var info = (AssignMessage)obj.Content;
 
+            transform.position = info.Position;
+        }
     }
 }

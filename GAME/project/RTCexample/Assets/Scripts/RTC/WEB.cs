@@ -15,13 +15,28 @@ public class WEB : ScriptableObject
 
     // UNITY-TO-WEB functions
     [DllImport("__Internal")]
-    public static extern int Send(string to, string message, string[] channels);
+    private static extern int UTWSend(string to, string message, string[] channels);
 
     [DllImport("__Internal")]
-    public static extern void Broadcast(string message, string[] channels);
+    private static extern void UTWBroadcast(string message, string[] channels);
 
     [DllImport("__Internal")]
-    public static extern void Disconnect();
+    private static extern void UTWDisconnect();
+
+    public static void Send(string to, BasicPeerContent message, string[] channels)
+    {
+        UTWSend(to, message.Serialize(), channels);
+    }
+
+    public static void Broadcast(BasicPeerContent message, string[] channels)
+    {
+        UTWBroadcast(message.Serialize(), channels);
+    }
+
+    public static void Disconnect()
+    {
+        UTWDisconnect();
+    }
 
     // public functions
 
@@ -30,12 +45,14 @@ public class WEB : ScriptableObject
     {
         string[] split = strmessage.Split('#');
 
+        BasicPeerContent content = BasicPeerContent.Deserialize(split[3]);
+
         PeerMessage msg = new PeerMessage()
         {
             Channel = split[0],
-            Peer = split[1],
+            Peer = split[1], // FROM 
             Timestamp = DateTime.Parse(split[2]),
-            Content = split[3]
+            Content = content,
         };
 
         onMessage(msg);

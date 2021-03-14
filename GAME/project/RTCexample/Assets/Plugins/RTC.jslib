@@ -1,5 +1,5 @@
 ﻿mergeInto(LibraryManager.library, {
-  Send: function (to, message, channels) {
+  UTWSend: function (to, message, channels) {
     /**
     * to:string
     * message:string
@@ -13,7 +13,7 @@
     );
   },
 
-  Broadcast: function (message, channels) {
+  UTWBroadcast: function (message, channels) {
     /**
     * message:string
     * channels:string|string[]
@@ -25,7 +25,7 @@
     );
   },
 
-  Disconnect: function () {
+  UTWDisconnect: function () {
     window.RTC.disconnect();
   },
 });

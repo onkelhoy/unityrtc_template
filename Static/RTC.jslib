@@ -1,5 +1,5 @@
 mergeInto(LibraryManager.library, {
-  send: function (to, message, channels) {
+  UTWSend: function (to, message, channels) {
     /**
     * to:string
     * message:string
@@ -13,7 +13,7 @@ mergeInto(LibraryManager.library, {
     );
   },
 
-  broadcast: function (message, channels) {
+  UTWBroadcast: function (message, channels) {
     /**
     * message:string
     * channels:string|string[]
@@ -25,39 +25,7 @@ mergeInto(LibraryManager.library, {
     );
   },
 
-  terminateSocket: function () {
-    window.RTC.terminateSocket();
-  },
-
-  terminate: function () {
-    window.RTC.terminate();
-  },
-
-  start: function () {
-    window.RTC.start();
-  },
-
-  create: function (room, password) {
-    /**
-    * room:string
-    * password:string
-    */
-
-    window.RTC.create(
-      Pointer_stringify(room), 
-      Pointer_stringify(password)
-    );
-  },
-
-  connect: function (room, password) {
-    /**
-    * room:string
-    * password:string
-    */
-
-    window.RTC.connect(
-      Pointer_stringify(room), 
-      Pointer_stringify(password)
-    );
+  UTWDisconnect: function () {
+    window.RTC.disconnect();
   },
 });
