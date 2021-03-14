@@ -13,9 +13,8 @@
     <script src="/client.js"></script>
     <script src="/progress.js"></script>
 
-    <script src="/%UNITY_WEBGL_LOADER_URL%"></script>
     <script>
-      window.unityInstance = UnityLoader.instantiate("unityContainer", "%UNITY_WEBGL_BUILD_URL%", {onProgress: UnityProgress});
+      window.UNITY.buildpath = "/%UNITY_WEBGL_LOADER_URL%";
     </script>
   </head>
   
@@ -48,6 +47,7 @@
     </section>
     <section class="loading center">
       <h1>loading..</h1>
+      <span><span id="peersready">0</span>/<span id="totalpeers">0</span> peers ready</span>
     </section>
     <section class="game center">
       <div id="unityContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px; margin: auto"></div>

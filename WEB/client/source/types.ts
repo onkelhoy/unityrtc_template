@@ -6,9 +6,6 @@ export type SocketEvents = {
 
 export type SendFunction = (message:SocketMessage) => void;
 
-export interface UnityInstance {
-  SendMessage: (GameObject:string, Method:string, Message:string) => void;
-}
 
 export enum ErrorType {
   ICE = "ice",
@@ -17,5 +14,33 @@ export enum ErrorType {
 
 export enum MODE {
   MENU,
-  GAME
+  GAME,
+}
+
+export interface IUnityInstance {
+  SendMessage: (GameObject:string, Method:string, Message:string) => void;
+  Module: { 
+    splashScreenStyle: string 
+  }
+  url:string;
+  onProgress: UnityOnProgress;
+}
+
+export type UnityOnProgress = (unityInstance: IUnityInstance, progress: number) => void;
+
+export interface IUnityLoader {
+  instantiate: (container:string, url:string, parameters:{ onProgress:UnityOnProgress }) => IUnityInstance;
+}
+
+export enum PeerSystemMessageType {
+  GAME_LOADED,
+  ALL,
+  START,
+}
+export interface PeerSystemMessage {
+  type:PeerSystemMessageType;
+}
+
+export interface PeerSystemTimestampMessage extends PeerSystemMessage {
+  timestamp:string;
 }

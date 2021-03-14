@@ -11,7 +11,7 @@ import { 
   SocketErrorType,
   SocketMessageError,
 } from '../common.types';
-import { SendFunction } from '../types';
+import { PeerSystemMessage, SendFunction } from '../types';
 
 import Peer from './peer';
 import Socket from './socket';
@@ -48,7 +48,6 @@ class Bridge {
   _farwell = (timestamp:string) => {
     // SECTION GAME-START 
     window.UI.start(timestamp);
-    window.UNITY.start(timestamp);
     if (this.socket) this.terminateSocket();
   }
   _hostChange = ({ host } : SocketMessageHostChange) => {
@@ -91,9 +90,9 @@ class Bridge {
     if (this.socket) this.socket.close();
   }
 
-  systemSend(message:string) {
+  systemSend(message:PeerSystemMessage) {
     for (const peer in this.peers) {
-      this.peers[peer].systemSend(message);
+      this.peers[peer].systemSend(JSON.stringify(message));
     }
   }
   

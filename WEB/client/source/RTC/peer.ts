@@ -14,6 +14,7 @@ interface Channel {
 
 class Peer {
   remote:string;
+  gameLoaded:boolean;
   connection:webkitRTCPeerConnection;
   channels:{[key:string]:Channel};
   close:Function;
@@ -59,6 +60,7 @@ class Peer {
     pc.onconnectionstatechange = this.ConnectionStateChange.bind(this);
     pc.ondatachannel = this.onDataChannel.bind(this);
 
+    this.gameLoaded = false;
     this.remote = remote;
     this.channels = {};
     this.close = close;

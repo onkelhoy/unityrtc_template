@@ -1,5 +1,5 @@
-import { SocketErrorType } from "../common.types";
-import { MODE } from "../types";
+import { SocketErrorType } from "./common.types";
+import { MODE, UnityOnProgress, IUnityInstance, PeerSystemMessageType } from "./types";
 
 window.UI = {
   Create: function () {
@@ -18,6 +18,9 @@ window.UI = {
     window.MODE = MODE.GAME;
     document.querySelector("section.menu").classList.remove("active");
     document.querySelector("section.loading").classList.add("active");
+
+    // load in unity script
+    LoadUnity(timestamp);
 
     window.setTimeout(() => {
       document.querySelector("section.loading").classList.remove("active");
@@ -100,4 +103,29 @@ function gatherInfo(): { room:string, password: string } {
   const password:string = (document.querySelector("#password") as HTMLInputElement).nodeValue;
 
   return { room, password }
+}
+
+function LoadUnity(timestamp:string) {
+  if (!window.UNITY.loaded) {
+    window.UNITY.loaded = true;
+
+    const script = document.createElement("script");
+    script.src = window.UNITY.buildpath;
+  
+    script.onload = function () {
+      // window.UNITY.start(timestamp);
+      // window.unityInstance = UnityLoader.instantiate("unityContainer", "Build/alpha.json", {onProgress: UnityOnProgress});
+      window.UNITY.instance = window.UNITY.loader.instantiate("unityContainer", window.UNITY.buildpath, { onProgress })
+    }
+    document.head.appendChild(script);
+  }
+  
+}
+
+// progress = [0, 1]
+function onProgress (unityInstance: IUnityInstance, progress: number) {
+
+  if (progress >= 1) { // you never know..
+    window.RTC.systemSend({ type: PeerSystemMessageType.GAME_LOADED })
+  }
 }

@@ -5,7 +5,7 @@
   "main": "source/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack-build": "webpack && node cleanup.js",
+    "webpack-build": "webpack",
     "start": "node product",
     "build": "tsc",
     "start:dev": "NODE_ENV=development webpack",

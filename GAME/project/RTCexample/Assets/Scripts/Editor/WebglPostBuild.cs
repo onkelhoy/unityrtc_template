@@ -21,6 +21,8 @@ public class WebglPostBuild
             {
                 string text = File.ReadAllText(file);
                 text = text.Replace(@"Mac OS X (10[\.\_\d]+)", @"Mac OS X (1[\.\_\d][\.\_\d]+)");
+                text = text.Replace(@"var UnityLoader=UnityLoader||", @"window.UNITY.loader=UnityLoader||");
+
                 File.WriteAllText(file, text);
             }
         }
