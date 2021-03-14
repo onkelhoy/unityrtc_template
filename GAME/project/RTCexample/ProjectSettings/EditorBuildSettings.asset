@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/RTCexample.unity
+    guid: 475989ca3b49a4e739d8c2e01b494af3
   m_configObjects: {}
