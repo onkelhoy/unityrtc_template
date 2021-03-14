@@ -20,8 +20,7 @@ public class WebglPostBuild
             if (file.ToLower().Contains("loader.js"))
             {
                 string text = File.ReadAllText(file);
-                text = text.Replace(@"Mac OS X (10[\.\_\d]+)", @"Mac OS X (1[\.\_\d][\.\_\d]+)");
-                text = text.Replace(@"var UnityLoader=UnityLoader||", @"window.UNITY.loader=UnityLoader||");
+                text = text.Replace(@"Mac OS X (10[\.\_\d]+)", @"Mac OS X (1[\.\_\d][\.\_\d]+)") + "window.UNITY.Loader=UnityLoader;";
 
                 File.WriteAllText(file, text);
             }

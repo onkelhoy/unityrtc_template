@@ -13,10 +13,9 @@ declare global {
       message: (channel:string, peer_id:string, msg:string) => void;
       disconnect: (peer_id:string) => void;
       start: (timestamp:string) => void;
-      buildpath:string; // this is assigned in template.html
-      instance:IUnityInstance;
+      instance:IUnityInstance|null;
       loaded:boolean;
-      loader:IUnityLoader;
+      Loader:IUnityLoader|null;
     },
     WEB: {
       connectionUpdate: (id:string, state:RTCPeerConnectionState) => void;
@@ -120,17 +119,28 @@ function sendToUnity(method:string, message:string):void {
   }
 }
 
-window.UNITY.message = function(channel, peer_id, message) {
-  console.log(`message channel: ${channel} peer_id: ${peer_id}, message: ${message}`);
-  sendToUnity("message", `${peer_id}#${channel}#${message}`);
-}
-
-window.UNITY.disconnect = function(peer_id) {
-  console.log(`disconnected peer id: ${peer_id}`);
-  sendToUnity("disconnect", peer_id);
-}
-
-window.UNITY.start = function(timestamp) {
-  console.log(`Starting game ${timestamp}`);
-  sendToUnity("start", `${window.ID}${window.ROOM}#${window.HOST}#${timestamp}#${Object.keys(window.RTC.peers).join()}`);
+window.UNITY = {
+  message: function(channel, peer_id, message) {
+    console.log(`message channel: ${channel} peer_id: ${peer_id}, message: ${message}`);
+    sendToUnity("message", `${peer_id}#${channel}#${message}`);
+  },
+  
+  disconnect: function(peer_id) {
+    console.log(`disconnected peer id: ${peer_id}`);
+    sendToUnity("disconnect", peer_id);
+  },
+  
+  start: function(timestamp) {
+    console.log(`Starting game ${timestamp}`);
+  
+    window.setTimeout(() => {
+      document.querySelector("section.loading").classList.remove("active");
+      document.querySelector("section.game").classList.add("active");
+    }, 2000);
+  
+    sendToUnity("start", `${window.ID}${window.ROOM}#${window.HOST}#${timestamp}#${Object.keys(window.RTC.peers).join()}`);
+  },
+  instance: null,
+  loaded: false,
+  Loader: null,
 }

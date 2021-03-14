@@ -21,11 +21,6 @@ window.UI = {
 
     // load in unity script
     LoadUnity(timestamp);
-
-    window.setTimeout(() => {
-      document.querySelector("section.loading").classList.remove("active");
-      document.querySelector("section.game").classList.add("active");
-    }, 2000);
   },
   disconnect: (id) => {
     console.log('remove', id);
@@ -110,12 +105,14 @@ function LoadUnity(timestamp:string) {
     window.UNITY.loaded = true;
 
     const script = document.createElement("script");
-    script.src = window.UNITY.buildpath;
+    script.src = '/game/desktop/UnityLoader.js'; //NOTE hard coded but can easily be changed to work with multiple versions
   
     script.onload = function () {
       // window.UNITY.start(timestamp);
       // window.unityInstance = UnityLoader.instantiate("unityContainer", "Build/alpha.json", {onProgress: UnityOnProgress});
-      window.UNITY.instance = window.UNITY.loader.instantiate("unityContainer", window.UNITY.buildpath, { onProgress })
+      
+      console.log("loader", window.UNITY.Loader);
+      // window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", '/game/desktop/UnityLoader.js', { onProgress })
     }
     document.head.appendChild(script);
   }

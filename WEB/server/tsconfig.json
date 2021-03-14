@@ -4,7 +4,7 @@
     "baseUrl": "./source",
     "target": "es6",
     "module": "commonjs",
-    "outDir": "../../product",
+    "outDir": "../../build",
     "esModuleInterop": true,
     "noUnusedParameters": true
   },

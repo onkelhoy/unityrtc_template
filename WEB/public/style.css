@@ -33,6 +33,10 @@ section.active {
   opacity: 1;
 }
 
+section.inactive {
+  top: 110%;
+}
+
 .center {
   display: flex;
   justify-content: center;
