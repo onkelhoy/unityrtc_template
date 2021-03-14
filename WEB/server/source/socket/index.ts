@@ -108,6 +108,14 @@ function answer(user:Socket, message: SocketRequestAnswer) {
 function leave(user:Socket) {
   roomCheck(user, () => {
     rooms[user.room].leave(user);
+
+    if (rooms[user.room].count === 0) {
+      console.log(user.room, 'is now free again')
+      delete rooms[user.room];
+      // NOTE can expand this so room stays and collects info at end of game
+      // and only then it will be "free" 
+      // this requires interval checks (every hour check if rooms has existed more than x amount then delete)
+    } 
   });
 }
 

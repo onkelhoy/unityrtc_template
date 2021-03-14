@@ -49,7 +49,7 @@ class Bridge {
     // SECTION GAME-START 
     window.UI.start(timestamp);
     window.UNITY.start(timestamp);
-    this.socket.close();
+    if (this.socket) this.terminateSocket();
   }
   _hostChange = ({ host } : SocketMessageHostChange) => {
     window.WEB.hostChange(host);
@@ -68,7 +68,7 @@ class Bridge {
     this.peers[from].handleCandidate(candidate);
   }
   _removePeer = (id:string) => {
-    this.peers[id].close();
+    if (this.peers[id]) this.peers[id].close();
     delete this.peers[id];
   }
   _fromPeer = (id:string) => {
@@ -88,7 +88,7 @@ class Bridge {
 
   // control
   terminateSocket() { 
-    this.socket.close();
+    if (this.socket) this.socket.close();
   }
 
   systemSend(message:string) {
@@ -114,7 +114,7 @@ class Bridge {
     }
   }
   disconnect () {
-    this.socket.close();
+    this.terminateSocket();
     for (const id in this.peers) {
       this._removePeer(id);
     }

@@ -26,7 +26,7 @@ window.UI = {
   },
   disconnect: (id) => {
     console.log('remove', id);
-    const target = document.querySelector(`#peers > li#${id}`);
+    const target = document.querySelector(`#peers > li#${id.replace('#', '-')}`);
     if (target) {
       target.parentNode.removeChild(target);
     }
@@ -77,7 +77,7 @@ window.WEB = {
     console.log(`Incomming peer connection : ${peer_id}`);
 
     const li = document.createElement("li");
-    li.setAttribute("id", peer_id);
+    li.setAttribute("id", peer_id.replace('#', '-'));
     li.innerText = peer_id;
 
     document.querySelector("#peers").appendChild(li);
@@ -90,7 +90,7 @@ window.WEB = {
     console.log(`hostChange : ${host}`);
 
     window.HOST = host;
-    document.querySelector("#start").setAttribute("disabled", window.ID === window.HOST ? "false" : "true");
+    (document.querySelector("#start") as HTMLInputElement).disabled = window.ID !== window.HOST;
   },
 }
 
