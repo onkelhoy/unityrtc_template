@@ -35,6 +35,8 @@ It will also push a template to be used by your build settings under the \
 
 When you build make sure to dump it into `/GAME/build` and now run `npm run prelease` to have your game under the product folder (which is your whole thing, should be fairly small)
 
+Game includes a simple menu that showcases how the RTC api works, and a super small click game just for testing purposes!
+
 ## /WEB
 
 triggers build for both client & server, copies common types for both (wanted a solution that involves one file but built takes it in - peerDependency does not work). Also moves /WEB/public into /product/public

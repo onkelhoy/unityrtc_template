@@ -15,6 +15,7 @@ class Room {
   password:string;
   users:{[key: string]:Socket}
   count:number;
+  idcounter:number;
   host:string|null;
 
   constructor(name:string, password = "") {
@@ -22,7 +23,10 @@ class Room {
     this.password = password;
     this.users = {};
     this.count = 0;
+    this.idcounter = 0;
     this.host = null;
+
+    console.log('creating room', name)
   }
 
   join(user:Socket, password:string):void {
@@ -30,10 +34,11 @@ class Room {
       sendTo(user, { type: SocketTypes.Error, error: SocketErrorType.Join, message: "incorrect password" } as SocketMessageError);
     }
     // notify all
-    const id = `${this.name}#${this.count}`;
+    const id = `${this.name}#${this.idcounter}`;
     user.id = id;
     user.room = this.name;
     this.count++;
+    this.idcounter++;
 
     if (!this.host) {
       this.host = id;
@@ -44,9 +49,10 @@ class Room {
   }
 
   leave(user:Socket) {
-    this.users[user.id].close();
+    if (this.users[user.id]) this.users[user.id].close();
     delete this.users[user.id];
     // notify all in room
+
     this.count--;
     if (this.count > 0) {
       this.broadcast(user, { type: SocketTypes.Leave, id: user.id } as SocketMessageLeave);

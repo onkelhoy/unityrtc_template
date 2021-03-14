@@ -6,6 +6,6 @@ export function sendTo (socket: Socket, message: SocketMessage) {
   socket.send(strmessage);
 
   if (message.type === SocketTypes.Farwell) {
-    socket.close();
+    if (socket) socket.close();
   }
 };

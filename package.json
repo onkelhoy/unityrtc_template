@@ -4,10 +4,9 @@
   "description": "template bridge for unity and webrtc for the webgl builds",
   "scripts": {
     "b:web": "cd WEB && npm run build",
+    "b:complete": "cd scripts/ && sh build.sh",
     "start": "node product/index.js",
-    "prepare": "cd scripts/ && sh prepare.sh",
-    "prelease": "cd scripts/ && sh prelease.sh",
-    "buildstart": "npm run b:web && npm run start"
+    "prepare": "cd scripts/ && sh prepare.sh"
   },
   "repository": {
     "type": "git",

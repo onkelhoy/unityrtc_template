@@ -28,7 +28,8 @@ const rooms:{[key:string]: Room} = {};
 const wss = new WebSocket.Server({ noServer: true });
 
 wss.on("connection", function (user:Socket) {
-  user.on("message", onMessage.bind(user)); // binding just so ts can shutup..
+  user.on("message", onMessage.bind(user));
+  user.on('close', onClose.bind(user));
 });
 
 function onMessage(this:Socket, message: string) {
@@ -50,8 +51,14 @@ function onMessage(this:Socket, message: string) {
       return create(user, data as SocketRequestCreate);
     case SocketTypes.Farwell:
       return farwell(user);
+    case SocketTypes.HeartBeat:
+      return heartbeat(user);
   }
 }
+
+function onClose(this:Socket) {
+  leave(this);
+} 
 
 function roomCheck(user:Socket, cb:Function) {
   const { room } = user;
@@ -66,11 +73,16 @@ function roomCheck(user:Socket, cb:Function) {
   }
 }
 
+function heartbeat(user:Socket) {
+  user.heartbeat = Date.now();
+}
 
 function farwell(user:Socket) {
   roomCheck(user, () => {
-    if (rooms[user.room].farwell(user))
+    if (rooms[user.room].farwell(user)) {
       delete rooms[user.room];
+      console.log('room deleted', user.room);
+    } 
   });
 }
 
@@ -96,6 +108,14 @@ function answer(user:Socket, message: SocketRequestAnswer) {
 function leave(user:Socket) {
   roomCheck(user, () => {
     rooms[user.room].leave(user);
+
+    if (rooms[user.room].count === 0) {
+      console.log(user.room, 'is now free again')
+      delete rooms[user.room];
+      // NOTE can expand this so room stays and collects info at end of game
+      // and only then it will be "free" 
+      // this requires interval checks (every hour check if rooms has existed more than x amount then delete)
+    } 
   });
 }
 

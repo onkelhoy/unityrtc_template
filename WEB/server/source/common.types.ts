@@ -1,4 +1,5 @@
 export enum SocketTypes {
+  HeartBeat = 'heartbeat',
   Create = "room",
   Connect = "connect",
   Join = "join",
