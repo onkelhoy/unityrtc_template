@@ -9,5 +9,6 @@
     "build": "npm run prebuild && cd server && npm run build && cd ../client && npm run build"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {}
 }
