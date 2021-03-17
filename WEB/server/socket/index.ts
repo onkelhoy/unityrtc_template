@@ -1,4 +1,6 @@
 import WebSocket from "ws";
+import redis from 'redis';
+
 import { sendTo } from "../utils";
 import { 
   SocketRequestCandidate, 
@@ -12,20 +14,24 @@ import {
   SocketMessageCandidate, 
   SocketMessageAnswer,
   SocketMessageOffer,
-  SocketMessageCreate,  
-  SocketMessageJoin,
-  SocketMessageJoinAnswer,
   SocketTypes,
   SocketErrorType,
-} from '../common.types';
+} from 'common';
 import { 
   Socket, 
-} from '../types';
+} from 'server/types';
 
 import Room from "./room";
 
 const rooms:{[key:string]: Room} = {};
 const wss = new WebSocket.Server({ noServer: true });
+const redisClient = redis.createClient();
+
+redisClient.on('error', error => {
+  console.error('redis error', error);
+
+  console.log("tjabba tjena hallå");
+});
 
 wss.on("connection", function (user:Socket) {
   user.on("message", onMessage.bind(user));

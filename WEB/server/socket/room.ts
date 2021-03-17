@@ -1,5 +1,5 @@
-import { sendTo } from "../utils";
-import { Socket } from "../types";
+import { sendTo } from "server/utils";
+import { Socket } from "server/types";
 import { 
   SocketMessage, 
   SocketMessageLeave,
@@ -8,7 +8,7 @@ import {
   SocketMessageError, 
   SocketTypes,
   SocketErrorType
-} from '../common.types';
+} from 'common';
 
 class Room {
   name:string;

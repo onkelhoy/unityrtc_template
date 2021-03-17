@@ -1,5 +1,5 @@
-import { Socket } from "./types";
-import { SocketMessage, SocketTypes } from "./common.types";
+import { Socket } from "server/types";
+import { SocketMessage, SocketTypes } from "common";
 
 export function sendTo (socket: Socket, message: SocketMessage) {
   const strmessage = JSON.stringify(message);

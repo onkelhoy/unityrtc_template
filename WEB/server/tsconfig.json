@@ -1,12 +1,9 @@
 {
-  "compileOnSave": true,
+  "extends": "../base",
   "compilerOptions": {
-    "baseUrl": "./source",
     "target": "es6",
     "module": "commonjs",
     "outDir": "../../build",
-    "esModuleInterop": true,
-    "noUnusedParameters": true
-  },
-  "exclude": ["./node_modules"]
+    "esModuleInterop": true
+  }
 }
