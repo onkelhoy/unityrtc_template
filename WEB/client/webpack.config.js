@@ -11,7 +11,7 @@ module.exports = {
     extensions: [".ts", ".js"],
   },
   externals: [nodeExternals()],
-  entry: "./source/index.ts",
+  entry: "./index.ts",
   output: {
     path: path.resolve(__dirname, "../../build/public"),
     filename: "client.js",

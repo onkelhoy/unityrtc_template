@@ -1,5 +1,5 @@
-import { SocketErrorType } from "./common.types";
-import { MODE, UnityOnProgress, IUnityInstance, PeerSystemMessageType } from "./types";
+import { SocketErrorType } from "common";
+import { MODE, UnityOnProgress, IUnityInstance, PeerSystemMessageType } from "client/types";
 
 window.UI = {
   Create: function () {
@@ -103,11 +103,13 @@ function gatherInfo(): { room:string, password: string } {
 function LoadUnity(timestamp:string) {
   if (!window.UNITY.loaded) {
     window.UNITY.loaded = true;
+    console.log(timestamp);
 
     const script = document.createElement("script");
     script.src = '/game/desktop/UnityLoader.js'; //NOTE hard coded but can easily be changed to work with multiple versions
   
     script.onload = function () {
+      // TODO request specific game based on dimensions
       // window.UNITY.start(timestamp);
       // window.unityInstance = UnityLoader.instantiate("unityContainer", "Build/alpha.json", {onProgress: UnityOnProgress});
       
@@ -121,8 +123,8 @@ function LoadUnity(timestamp:string) {
 
 // progress = [0, 1]
 function onProgress (unityInstance: IUnityInstance, progress: number) {
-
-  if (progress >= 1) { // you never know..
-    window.RTC.systemSend({ type: PeerSystemMessageType.GAME_LOADED })
-  }
+  console.log('unityInstance', unityInstance, 'progress', progress)
+  // if (progress >= 1) { // you never know..
+  //   window.RTC.systemSend({ type: PeerSystemMessageType.GAME_LOADED })
+  // }
 }

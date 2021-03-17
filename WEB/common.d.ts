@@ -22,7 +22,7 @@ export enum SocketErrorType {
 
 export interface SocketMessage {
   type:SocketTypes;
-};
+}
 
 //#region request messages
 // can add whatever to it now
@@ -64,10 +64,6 @@ export interface SocketMessageJoin extends SocketMessage {
 
 export interface SocketMessageHostChange extends SocketMessage {
   host:string;
-}
-
-export interface SocketMessageCreate extends SocketMessage {
-  id:string;
 }
 
 export interface SocketMessageJoinAnswer extends SocketMessage {

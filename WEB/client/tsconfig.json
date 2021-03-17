@@ -1,5 +1,9 @@
 {
+  "extends": "../base",
   "compilerOptions": {
-    "removeComments": true
+    "removeComments": true,
+    "target": "es5",
+    "outDir": "trash",
+    "baseUrl": "."
   }
 }

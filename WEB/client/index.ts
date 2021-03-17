@@ -1,10 +1,18 @@
 import Bridge from './RTC/bridge';
-import { ErrorType, IUnityInstance, MODE, IUnityLoader, PeerSystemMessage, PeerSystemMessageType, PeerSystemTimestampMessage } from './types';
+import { ErrorType, IUnityInstance, MODE, IUnityLoader, PeerSystemMessage, PeerSystemMessageType, PeerSystemTimestampMessage } from 'client/types';
 
 import './UI';
-import { SocketErrorType, SocketTypes } from './common.types';
+import { SocketErrorType, SocketTypes } from 'common';
 
 // unityInstance = UnityLoader.instantiate("unityContainer", "Build/build.json", {onProgress: UnityProgress});
+
+// TODO: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Intercept_HTTP_requests
+// or directly from server to cache which platform client desires
+// so the build file which whould be located at /games/versions/desktop/Build/..
+// but the unity instance requires it to be loaded at root /unity-bla-nla
+// NOTE Task
+// configure a way of choice to achive this 
+// should default back to some default build (depends on request solution)
 
 declare global {
   interface Window { 

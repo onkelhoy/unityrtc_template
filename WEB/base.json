@@ -1,0 +1,9 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "removeComments": true,
+    "noUnusedParameters": true
+  },
+  "exclude": ["./node_modules"]
+}

@@ -10,8 +10,8 @@ import { 
   SocketTypes,
   SocketErrorType,
   SocketMessageError,
-} from '../common.types';
-import { PeerSystemMessage, SendFunction } from '../types';
+} from 'common';
+import { PeerSystemMessage, SendFunction } from 'client/types';
 
 import Peer from './peer';
 import Socket from './socket';
