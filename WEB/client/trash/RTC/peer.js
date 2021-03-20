@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var common_1 = require("common");
-var types_1 = require("client/types");
+var types_1 = require("types");
 var Peer = (function () {
     function Peer(send, remote, close) {
         var _this = this;

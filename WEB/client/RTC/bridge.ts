@@ -11,7 +11,7 @@ import { 
   SocketErrorType,
   SocketMessageError,
 } from 'common';
-import { PeerSystemMessage, SendFunction } from 'client/types';
+import { PeerSystemMessage, SendFunction } from 'types';
 
 import Peer from './peer';
 import Socket from './socket';

@@ -5,7 +5,7 @@ import { 
   SocketMessageLeave,
   SocketMessageJoinAnswer,
 } from 'common';
-import { SocketEvents } from 'client/types';
+import { SocketEvents } from 'types';
 
 class Socket {
   ws:WebSocket;

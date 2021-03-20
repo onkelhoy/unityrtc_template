@@ -5,7 +5,7 @@ import {
 
   SocketTypes
 } from 'common';
-import { ErrorType, SendFunction } from 'client/types';
+import { ErrorType, SendFunction } from 'types';
 
 interface Channel {
   channel:RTCDataChannel,

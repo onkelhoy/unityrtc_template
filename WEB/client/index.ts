@@ -1,7 +1,7 @@
-import Bridge from './RTC/bridge';
-import { ErrorType, IUnityInstance, MODE, IUnityLoader, PeerSystemMessage, PeerSystemMessageType, PeerSystemTimestampMessage } from 'client/types';
+import Bridge from 'RTC/bridge';
+import { ErrorType, IUnityInstance, MODE, IUnityLoader, PeerSystemMessage, PeerSystemMessageType, PeerSystemTimestampMessage } from 'types';
 
-import './UI';
+import 'UI';
 import { SocketErrorType, SocketTypes } from 'common';
 
 // unityInstance = UnityLoader.instantiate("unityContainer", "Build/build.json", {onProgress: UnityProgress});

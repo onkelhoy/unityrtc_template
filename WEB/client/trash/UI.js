@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var common_1 = require("common");
-var types_1 = require("client/types");
+var types_1 = require("types");
 window.UI = {
     Create: function () {
         var info = gatherInfo();

@@ -1,5 +1,5 @@
 import { SocketErrorType } from "common";
-import { MODE, UnityOnProgress, IUnityInstance, PeerSystemMessageType } from "client/types";
+import { MODE, UnityOnProgress, IUnityInstance, PeerSystemMessageType } from "types";
 
 window.UI = {
   Create: function () {
