@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { SocketMessage } from 'common';
+import { SocketMessage } from './common';
 
 export interface Socket extends WebSocket {
   room:string;
@@ -9,4 +9,18 @@ export interface Socket extends WebSocket {
 
 export interface Message extends SocketMessage  {
   message: string;
+}
+
+export interface CacheData {}
+
+export interface RoomCache extends CacheData {
+  room:string;
+  password:string;
+  peers:string[];
+  host:string;
+}
+
+export interface ClientCache extends CacheData {
+  id:string;
+  game_path:string;
 }

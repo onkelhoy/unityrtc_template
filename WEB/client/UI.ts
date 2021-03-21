@@ -1,5 +1,5 @@
-import { SocketErrorType } from "common";
-import { MODE, UnityOnProgress, IUnityInstance, PeerSystemMessageType } from "types";
+import { SocketErrorType, SET_UNITY_PREFERENCE } from "./common";
+import { MODE, UnityOnProgress, IUnityInstance, PeerSystemMessageType } from "./types";
 
 window.UI = {
   Create: function () {
@@ -100,13 +100,30 @@ function gatherInfo(): { room:string, password: string } {
   return { room, password }
 }
 
-function LoadUnity(timestamp:string) {
+async function LoadUnity(timestamp:string) {
   if (!window.UNITY.loaded) {
     window.UNITY.loaded = true;
     console.log(timestamp);
 
+    const response = await fetch('/set-unity-preference', {
+      method: "post",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        pixelRatio: window.devicePixelRatio,
+        id: window.ID,
+        room: window.ROOM,
+      } as SET_UNITY_PREFERENCE)
+    })
+    const { name } = await response.json();
+
+    console.log('version', name);
+
     const script = document.createElement("script");
-    script.src = '/game/desktop/UnityLoader.js'; //NOTE hard coded but can easily be changed to work with multiple versions
+    script.src = '/Build/UnityLoader.js'; //NOTE hard coded but can easily be changed to work with multiple versions
   
     script.onload = function () {
       // TODO request specific game based on dimensions
@@ -114,7 +131,7 @@ function LoadUnity(timestamp:string) {
       // window.unityInstance = UnityLoader.instantiate("unityContainer", "Build/alpha.json", {onProgress: UnityOnProgress});
       
       console.log("loader", window.UNITY.Loader);
-      // window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", '/game/desktop/UnityLoader.js', { onProgress })
+      window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", `Build/${name}.json`, { onProgress })
     }
     document.head.appendChild(script);
   }

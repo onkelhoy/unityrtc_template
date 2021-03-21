@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var bridge_1 = require("RTC/bridge");
-var types_1 = require("types");
-require("UI");
-var common_1 = require("common");
+var bridge_1 = require("./RTC/bridge");
+var types_1 = require("./types");
+require("./UI");
+var common_1 = require("./common");
 window.RTC = new bridge_1.default();
 window.MODE = types_1.MODE.MENU;
 window.PEER = {

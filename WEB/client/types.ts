@@ -1,4 +1,4 @@
-import { SocketMessage } from "common";
+import { SocketMessage } from "./common";
 
 export type SocketEvents = {
   [key:string]: Function[]

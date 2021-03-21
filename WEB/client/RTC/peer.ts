@@ -4,8 +4,8 @@ import {
   SocketRequestOffer, 
 
   SocketTypes
-} from 'common';
-import { ErrorType, SendFunction } from 'types';
+} from '../common';
+import { ErrorType, SendFunction } from '../types';
 
 interface Channel {
   channel:RTCDataChannel,

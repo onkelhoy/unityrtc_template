@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var common_1 = require("common");
+var common_1 = require("../common");
 var peer_1 = require("./peer");
 var socket_1 = require("./socket");
 var Bridge = (function () {

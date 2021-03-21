@@ -10,15 +10,14 @@ import { 
   SocketTypes,
   SocketErrorType,
   SocketMessageError,
-} from 'common';
-import { PeerSystemMessage, SendFunction } from 'types';
+} from '../common';
+import { PeerSystemMessage, SendFunction } from '../types';
 
 import Peer from './peer';
 import Socket from './socket';
 
 class Bridge {
   socket:Socket;
-  id:string|null;
   peers: {[key:string]:Peer};
   _socketsend:SendFunction;
 
@@ -26,7 +25,6 @@ class Bridge {
     const url = /http(.*)/.exec(window.location.href) || ["", "ERROR.url-split.error"];
     this.socket = new Socket(`ws${url[1]}`);
     this.peers = {};
-    this.id = null;
 
     // Socket also has some basic but this is a easy way to make new hooks
     this.socket.on(SocketTypes.Join, this._otherjoin);

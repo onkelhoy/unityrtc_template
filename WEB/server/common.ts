@@ -97,3 +97,11 @@ export interface SocketMessageAnswer extends SocketMessageP2P {
   answer:RTCSessionDescriptionInit
 }
 //#endregion
+
+export interface SET_UNITY_PREFERENCE {
+  id:string;
+  room:string;
+  width:number;
+  height:number;
+  pixelRatio:number;
+}
