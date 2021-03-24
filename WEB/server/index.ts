@@ -33,7 +33,7 @@ app.post('/set-unity-preference', function (req, res) {
 
   // Cache.set(`${screenInfo.room}${screenInfo.id}`, 'game/desktop/');
 
-  res.status(200).json({ name: 'lala' });
+  res.status(200).json({ name: 'test' });
 });
 
 app.get('/', function (_req, res) {
@@ -44,7 +44,7 @@ app.get('/', function (_req, res) {
 app.get('/Build/:file', function(req, res) {
   const params = req.params as { file:string };
   console.log("requesting file:", params.file);
-  const gameLocation = '/game/lala/Build'
+  const gameLocation = '/game/test/Build'
 
   console.log(path.join(__dirname, gameLocation, params.file));
 
