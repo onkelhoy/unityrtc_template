@@ -41,7 +41,6 @@ var types_1 = require("./types");
 window.UI = {
     Create: function () {
         var info = gatherInfo();
-        console.log(info);
         window.RTC.create(info.room, info.password);
     },
     Connect: function () {
@@ -50,12 +49,10 @@ window.UI = {
     },
     start: function (timestamp) {
         window.MODE = types_1.MODE.GAME;
-        document.querySelector("section.menu").classList.remove("active");
-        document.querySelector("section.loading").classList.add("active");
+        setActive('loading');
         LoadUnity(timestamp);
     },
     disconnect: function (id) {
-        console.log('remove', id);
         var target = document.querySelector("#peers > li#" + id.replace('#', '-'));
         if (target) {
             target.parentNode.removeChild(target);
@@ -115,35 +112,64 @@ function gatherInfo() {
     var password = document.querySelector("#password").nodeValue;
     return { room: room, password: password };
 }
+function setActive(name) {
+    console.log('setting active', name);
+    var current = document.querySelector('section.active');
+    if (current) {
+        console.log('found current', current.classList);
+        current.classList.remove('active');
+    }
+    var target = document.querySelector("section." + name);
+    target.classList.add('active');
+}
 function LoadUnity(timestamp) {
     return __awaiter(this, void 0, void 0, function () {
-        var script;
+        var response, name_1, script;
         return __generator(this, function (_a) {
-            if (!window.UNITY.loaded) {
-                window.UNITY.loaded = true;
-                console.log(timestamp);
-                fetch('/set-unity-preference', {
-                    method: "post",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        width: window.innerWidth,
-                        height: window.innerHeight,
-                        pixelRatio: window.devicePixelRatio
-                    })
-                });
-                script = document.createElement("script");
-                script.src = '/game/desktop/UnityLoader.js';
-                script.onload = function () {
-                    console.log("loader", window.UNITY.Loader);
-                };
-                document.head.appendChild(script);
+            switch (_a.label) {
+                case 0:
+                    if (!!window.UNITY.loaded) return [3, 3];
+                    window.UNITY.loaded = true;
+                    console.log(timestamp);
+                    return [4, fetch('/set-unity-preference', {
+                            method: "post",
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                width: window.innerWidth,
+                                height: window.innerHeight,
+                                pixelRatio: window.devicePixelRatio,
+                                id: window.ID,
+                                room: window.ROOM,
+                            })
+                        })];
+                case 1:
+                    response = _a.sent();
+                    return [4, response.json()];
+                case 2:
+                    name_1 = (_a.sent()).name;
+                    console.log('version', name_1);
+                    script = document.createElement("script");
+                    script.src = '/Build/UnityLoader.js';
+                    script.onload = function () {
+                        setActive('game');
+                        window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", "Build/" + name_1 + ".json", { onProgress: onProgress });
+                    };
+                    document.head.appendChild(script);
+                    _a.label = 3;
+                case 3: return [2];
             }
-            return [2];
         });
     });
 }
 function onProgress(unityInstance, progress) {
-    console.log('unityInstance', unityInstance, 'progress', progress);
+    if (progress >= 1) {
+        console.log('UNITY IS NOW LOADED');
+        unityInstance.SetFullscreen();
+        window.RTC.systemSend({ type: types_1.PeerSystemMessageType.GAME_LOADED });
+    }
 }
+window.onload = function () {
+    setActive('menu');
+};

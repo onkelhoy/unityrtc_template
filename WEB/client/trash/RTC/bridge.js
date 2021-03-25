@@ -52,7 +52,6 @@ var Bridge = (function () {
         var url = /http(.*)/.exec(window.location.href) || ["", "ERROR.url-split.error"];
         this.socket = new socket_1.default("ws" + url[1]);
         this.peers = {};
-        this.id = null;
         this.socket.on(common_1.SocketTypes.Join, this._otherjoin);
         this.socket.on(common_1.SocketTypes.HostChange, this._hostChange);
         this.socket.on(common_1.SocketTypes.Offer, this._offer);

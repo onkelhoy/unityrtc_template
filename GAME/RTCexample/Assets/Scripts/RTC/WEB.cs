@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System;
 
-public class WEB : ScriptableObject
+public class WEB : MonoBehaviour
 {
     public static string ROOM;
     public static string ID;
@@ -41,7 +41,7 @@ public class WEB : ScriptableObject
     // public functions
 
     // WEB-TO-UNITY functions
-    public void message(string strmessage)
+    public static void message(string strmessage)
     {
         string[] split = strmessage.Split('#');
 
@@ -59,6 +59,11 @@ public class WEB : ScriptableObject
         Debug.Log(string.Format("[{0}] message channel: {1} peer: {2}", msg.Timestamp.ToString(), msg.Channel, msg.Peer));
     }
 
+    public static void invokeMessage(PeerMessage msg)
+    {
+        onMessage(msg);
+    }
+
     public void disconnect(string peer_id)
     {
         onDisconnect(peer_id);
@@ -68,6 +73,7 @@ public class WEB : ScriptableObject
     public void start(string strmessage)
     {
         string[] split = strmessage.Split('#');
+        Debug.Log(string.Format("string: {0}, size: {1}", strmessage, split.Length));
 
         StartMessage start = new StartMessage()
         {
@@ -79,6 +85,7 @@ public class WEB : ScriptableObject
         WEB.ROOM = split[1];
         WEB.HOST = split[2];
 
+        Debug.Log("GAME IS NOW STARTING!!!!!");
         onStart(start);
         Debug.Log(string.Format("Starting game {0} at {1}", WEB.ROOM, start.Timestamp));
     }

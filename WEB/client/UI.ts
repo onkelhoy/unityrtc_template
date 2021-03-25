@@ -5,8 +5,6 @@ window.UI = {
   Create: function () {
     const info = gatherInfo();
 
-    console.log(info)
-
     window.RTC.create(info.room, info.password);
   },
   Connect: function () {
@@ -16,14 +14,12 @@ window.UI = {
   },
   start: function(timestamp) {
     window.MODE = MODE.GAME;
-    document.querySelector("section.menu").classList.remove("active");
-    document.querySelector("section.loading").classList.add("active");
+    setActive('loading');
 
     // load in unity script
     LoadUnity(timestamp);
   },
   disconnect: (id) => {
-    console.log('remove', id);
     const target = document.querySelector(`#peers > li#${id.replace('#', '-')}`);
     if (target) {
       target.parentNode.removeChild(target);
@@ -100,6 +96,18 @@ function gatherInfo(): { room:string, password: string } {
   return { room, password }
 }
 
+function setActive(name) {
+  console.log('setting active', name);
+  const current = document.querySelector('section.active');
+  if (current) {
+    console.log('found current', current.classList);
+    current.classList.remove('active');
+  }
+
+  const target = document.querySelector(`section.${name}`);
+  target.classList.add('active');
+}
+
 async function LoadUnity(timestamp:string) {
   if (!window.UNITY.loaded) {
     window.UNITY.loaded = true;
@@ -130,7 +138,7 @@ async function LoadUnity(timestamp:string) {
       // window.UNITY.start(timestamp);
       // window.unityInstance = UnityLoader.instantiate("unityContainer", "Build/alpha.json", {onProgress: UnityOnProgress});
       
-      console.log("loader", window.UNITY.Loader);
+      setActive('game');
       window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", `Build/${name}.json`, { onProgress })
     }
     document.head.appendChild(script);
@@ -140,8 +148,14 @@ async function LoadUnity(timestamp:string) {
 
 // progress = [0, 1]
 function onProgress (unityInstance: IUnityInstance, progress: number) {
-  console.log('unityInstance', unityInstance, 'progress', progress)
-  // if (progress >= 1) { // you never know..
-  //   window.RTC.systemSend({ type: PeerSystemMessageType.GAME_LOADED })
-  // }
+  if (progress >= 1) { // you never know..
+    // console.clear();
+    console.log('UNITY IS NOW LOADED')
+    unityInstance.SetFullscreen();
+    window.RTC.systemSend({ type: PeerSystemMessageType.GAME_LOADED });
+  }
+}
+
+window.onload = () => {
+  setActive('menu');
 }

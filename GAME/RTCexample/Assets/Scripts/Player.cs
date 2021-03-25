@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
 
         Material newMaterial = new Material(Shader.Find("Standard"));
 
-        newMaterial.color = WEB.HOST == WEB.ID ? new Color(1, 0, 0) : new Color(0, 0, 1);
+        newMaterial.color = WEB.HOST == WEB.ID ? Color.red : Color.blue;
         gameObjectRenderer.material = newMaterial;
 
         WEB.onMessage += WEB_onMessage;
@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
         {
             var info = (AssignMessage)obj.Content;
 
+            Debug.Log("ASSIGN INVOKED MUTHERFUKKKKAAAAAAAHHHHHH!!!!!!!");
             transform.position = info.Position;
         }
     }

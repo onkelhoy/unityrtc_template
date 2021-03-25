@@ -6,11 +6,13 @@
     * channels:string|string[]
     */
 
-    window.RTC.send(
-      Pointer_stringify(to), 
-      Pointer_stringify(message), 
-      Pointer_stringify(channels)
-    );
+    if (window.RTC)
+      window.RTC.send(
+        Pointer_stringify(to), 
+        Pointer_stringify(message), 
+        Pointer_stringify(channels)
+      );
+    else console.log("ERROR - send called but RTC is not avaliable");
   },
 
   UTWBroadcast: function (message, channels) {
@@ -19,13 +21,17 @@
     * channels:string|string[]
     */
 
-    window.RTC.broadcast(
-      Pointer_stringify(message), 
-      Pointer_stringify(channels)
-    );
+    if (window.RTC)
+      window.RTC.broadcast(
+        Pointer_stringify(message), 
+        Pointer_stringify(channels)
+      );
+    else console.log("ERROR - broadcast called but RTC is not avaliable");
   },
 
   UTWDisconnect: function () {
-    window.RTC.disconnect();
+    if (window.RTC) 
+      window.RTC.disconnect();
+    else console.log("ERROR - disconnect called but RTC is not avaliable");
   },
 });

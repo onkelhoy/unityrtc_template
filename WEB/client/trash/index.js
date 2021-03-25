@@ -11,15 +11,16 @@ window.PEER = {
     system: "system",
     loads: 0,
     gotAll: false,
-    peerMessage: function (peer_id, event) {
+    systemPeerMessage: function (peer_id, event) {
         var message = JSON.parse(event.data);
+        console.log('SYSTEM MESSAGE', peer_id, message);
         switch (message.type) {
             case types_1.PeerSystemMessageType.GAME_LOADED: {
                 if (window.RTC.peers[peer_id]) {
                     window.RTC.peers[peer_id].gameLoaded = true;
                 }
                 window.PEER.loads++;
-                if (window.PEER.loads === Object.keys(window.RTC.peers).length && window.PEER.gotAll) {
+                if (window.PEER.loads === Object.keys(window.RTC.peers).length && !window.PEER.gotAll) {
                     window.RTC.systemSend({ type: types_1.PeerSystemMessageType.ALL });
                 }
                 break;
@@ -27,9 +28,8 @@ window.PEER = {
             case types_1.PeerSystemMessageType.ALL: {
                 if (!window.PEER.gotAll) {
                     if (window.HOST === window.ID) {
-                        var timestamp = new Date().toTimeString();
+                        var timestamp = new Date().toISOString();
                         window.RTC.systemSend({ type: types_1.PeerSystemMessageType.START, timestamp: timestamp });
-                        window.UNITY.start(timestamp);
                     }
                 }
                 window.PEER.gotAll = true;
@@ -60,7 +60,7 @@ function heartbeat() {
 }
 function sendToUnity(method, message) {
     if (window.UNITY.instance) {
-        window.UNITY.instance.SendMessage("RTC", method, message);
+        window.UNITY.instance.SendMessage("WEB", method, message);
     }
 }
 window.UNITY = {
@@ -74,10 +74,6 @@ window.UNITY = {
     },
     start: function (timestamp) {
         console.log("Starting game " + timestamp);
-        window.setTimeout(function () {
-            document.querySelector("section.loading").classList.remove("active");
-            document.querySelector("section.game").classList.add("active");
-        }, 2000);
         sendToUnity("start", "" + window.ID + window.ROOM + "#" + window.HOST + "#" + timestamp + "#" + Object.keys(window.RTC.peers).join());
     },
     instance: null,

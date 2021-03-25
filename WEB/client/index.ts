@@ -40,7 +40,7 @@ declare global {
       system:string;
       loads:number;
       gotAll:boolean;
-      peerMessage: (peer_id:string, event:MessageEvent) => void;
+      systemPeerMessage: (peer_id:string, event:MessageEvent) => void;
     },
     UI: {
       Create: () => void;
@@ -66,8 +66,9 @@ window.PEER = {
   loads: 0,
   gotAll: false,
 
-  peerMessage: (peer_id, event) => {
+  systemPeerMessage: (peer_id, event) => {
     const message = JSON.parse(event.data) as PeerSystemMessage;
+    console.log('SYSTEM MESSAGE', peer_id, message);
     
     switch (message.type) {
       case PeerSystemMessageType.GAME_LOADED: {
@@ -76,7 +77,7 @@ window.PEER = {
         }
         window.PEER.loads++;
 
-        if (window.PEER.loads === Object.keys(window.RTC.peers).length && window.PEER.gotAll) {
+        if (window.PEER.loads === Object.keys(window.RTC.peers).length && !window.PEER.gotAll) {
           window.RTC.systemSend({ type: PeerSystemMessageType.ALL })
         }
         break
@@ -85,10 +86,9 @@ window.PEER = {
         if (!window.PEER.gotAll) {
           // TODO start game
           if (window.HOST === window.ID) {
-            const timestamp = new Date().toTimeString();
+            const timestamp = new Date().toISOString();
 
             window.RTC.systemSend({ type: PeerSystemMessageType.START, timestamp } as PeerSystemTimestampMessage);
-            window.UNITY.start(timestamp);
           }
         }
         window.PEER.gotAll = true;
@@ -122,7 +122,7 @@ function heartbeat () {
 
 function sendToUnity(method:string, message:string):void {
   if (window.UNITY.instance) {
-    window.UNITY.instance.SendMessage("RTC", method, message);
+    window.UNITY.instance.SendMessage("WEB", method, message);
   }
 }
 
@@ -140,11 +140,11 @@ window.UNITY = {
   start: function(timestamp) {
     console.log(`Starting game ${timestamp}`);
   
-    window.setTimeout(() => {
-      document.querySelector("section.loading").classList.remove("active");
-      document.querySelector("section.game").classList.add("active");
-    }, 2000);
-  
+    // window.setTimeout(() => {
+    //   document.querySelector("section.loading").classList.remove("active");
+    //   document.querySelector("section.game").classList.add("active");
+
+    // }, 2000);
     sendToUnity("start", `${window.ID}${window.ROOM}#${window.HOST}#${timestamp}#${Object.keys(window.RTC.peers).join()}`);
   },
   instance: null,

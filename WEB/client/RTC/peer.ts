@@ -134,7 +134,7 @@ class Peer {
       window.UNITY.message(name, this.remote, event.data);
     }
     else {
-      window.PEER.peerMessage(this.remote, event);
+      window.PEER.systemPeerMessage(this.remote, event);
     }
   }
 
