@@ -13,7 +13,7 @@ export enum ErrorType {
 }
 
 export enum MODE {
-  MENU,
+  MENU = 1,
   GAME,
 }
 
@@ -25,6 +25,7 @@ export interface IUnityInstance {
   url:string;
   onProgress: UnityOnProgress;
   SetFullscreen:Function;
+  onError:(error:string)=>void;
 }
 
 export type UnityOnProgress = (unityInstance: IUnityInstance, progress: number) => void;
@@ -34,9 +35,10 @@ export interface IUnityLoader {
 }
 
 export enum PeerSystemMessageType {
-  GAME_LOADED,
+  GAME_LOADED = 1,
   ALL,
   START,
+  CONNECTION_INIT,
 }
 export interface PeerSystemMessage {
   type:PeerSystemMessageType;
@@ -44,4 +46,8 @@ export interface PeerSystemMessage {
 
 export interface PeerSystemTimestampMessage extends PeerSystemMessage {
   timestamp:string;
+}
+
+export interface PeerSystemConnectionInitMessage extends PeerSystemMessage {
+  id:string;
 }

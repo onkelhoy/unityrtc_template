@@ -63,6 +63,12 @@ var Peer = (function () {
     Peer.prototype.onDataChannel = function (event) {
         var channel = event.channel;
         this.setUpChannel(channel);
+        if (channel.label === window.PEER.system) {
+            this.systemSend(JSON.stringify({
+                type: types_1.PeerSystemMessageType.CONNECTION_INIT,
+                id: window.ID
+            }));
+        }
     };
     Peer.prototype.setUpChannel = function (channel) {
         var _this = this;
@@ -125,6 +131,7 @@ var Peer = (function () {
     Peer.prototype.handleOffer = function (send, desription) {
         var _this = this;
         this.connection.setRemoteDescription(new RTCSessionDescription(desription));
+        this.createChannel(window.PEER.system);
         return this.connection
             .createAnswer()
             .then(function (answer) {
@@ -151,6 +158,7 @@ var Peer = (function () {
             this.channels[window.PEER.system].channel.send(message);
         }
         else {
+            console.log('system message stored for later');
             this.channels[window.PEER.system].queue.push(message);
         }
     };

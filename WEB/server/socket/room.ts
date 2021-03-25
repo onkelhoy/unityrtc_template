@@ -7,7 +7,8 @@ import {
   SocketMessageJoinAnswer,
   SocketMessageError, 
   SocketTypes,
-  SocketErrorType
+  SocketErrorType,
+  SocketFarwell,
 } from '../common';
 
 class Room {
@@ -71,9 +72,9 @@ class Room {
     }
   }
 
-  farwell(user:Socket) {
+  farwell(user:Socket, timestamp:number) {
     if (user.id === this.host) {
-      this.broadcast(null, { type: SocketTypes.Farwell });
+      this.broadcast(null, { type: SocketTypes.Farwell, timestamp } as SocketFarwell);
       return true;
     } 
     

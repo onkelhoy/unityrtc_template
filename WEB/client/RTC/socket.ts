@@ -18,7 +18,7 @@ class Socket {
     this.ws.onmessage = this.message.bind(this);
   }
 
-  on(event:string, callback:Function) {
+  on(event:string, callback:(message:SocketMessage)=>void) {
     if (!this.events[event]) this.events[event] = new Array<Function>();
 
     this.events[event].push(callback);

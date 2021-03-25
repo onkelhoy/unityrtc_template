@@ -12,7 +12,7 @@ window.UI = {
 
     window.RTC.connect(info.room, info.password);
   },
-  start: function(timestamp) {
+  start: function(timestamp:string) {
     window.MODE = MODE.GAME;
     setActive('loading');
 
@@ -110,8 +110,9 @@ function setActive(name) {
 
 async function LoadUnity(timestamp:string) {
   if (!window.UNITY.loaded) {
+    console.log('UNITY LOADING...');
     window.UNITY.loaded = true;
-    console.log(timestamp);
+    console.log('timestamp', timestamp);
 
     const response = await fetch('/set-unity-preference', {
       method: "post",
@@ -128,7 +129,7 @@ async function LoadUnity(timestamp:string) {
     })
     const { name } = await response.json();
 
-    console.log('version', name);
+    console.log('GAME version:', name);
 
     const script = document.createElement("script");
     script.src = '/Build/UnityLoader.js'; //NOTE hard coded but can easily be changed to work with multiple versions
@@ -139,7 +140,7 @@ async function LoadUnity(timestamp:string) {
       // window.unityInstance = UnityLoader.instantiate("unityContainer", "Build/alpha.json", {onProgress: UnityOnProgress});
       
       setActive('game');
-      window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", `Build/${name}.json`, { onProgress })
+      window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", `Build/${name}.json`, { onProgress });
     }
     document.head.appendChild(script);
   }
@@ -148,6 +149,11 @@ async function LoadUnity(timestamp:string) {
 
 // progress = [0, 1]
 function onProgress (unityInstance: IUnityInstance, progress: number) {
+  console.log('PROGRES', progress);
+
+  unityInstance.onError = err => {
+    console.log('UUUUUNITY ERROR', err)
+  };
   if (progress >= 1) { // you never know..
     // console.clear();
     console.log('UNITY IS NOW LOADED')

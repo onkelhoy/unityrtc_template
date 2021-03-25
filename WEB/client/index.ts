@@ -1,5 +1,14 @@
 import Bridge from './RTC/bridge';
-import { ErrorType, IUnityInstance, MODE, IUnityLoader, PeerSystemMessage, PeerSystemMessageType, PeerSystemTimestampMessage } from './types';
+import { 
+  ErrorType, 
+  IUnityInstance, 
+  MODE, 
+  IUnityLoader, 
+  PeerSystemMessage, 
+  PeerSystemMessageType, 
+  PeerSystemTimestampMessage,
+  PeerSystemConnectionInitMessage
+} from './types';
 
 import './UI';
 import { SocketErrorType, SocketTypes } from './common';
@@ -68,10 +77,16 @@ window.PEER = {
 
   systemPeerMessage: (peer_id, event) => {
     const message = JSON.parse(event.data) as PeerSystemMessage;
-    console.log('SYSTEM MESSAGE', peer_id, message);
     
     switch (message.type) {
+      case PeerSystemMessageType.CONNECTION_INIT: {
+        const { id } = message as PeerSystemConnectionInitMessage
+        console.log('RTC init from', id);
+        break;
+      }
       case PeerSystemMessageType.GAME_LOADED: {
+        console.log('GAME LOADED LASKLKDLAKDLAKSD')
+
         if (window.RTC.peers[peer_id]) {
           window.RTC.peers[peer_id].gameLoaded = true;
         }
@@ -88,14 +103,18 @@ window.PEER = {
           if (window.HOST === window.ID) {
             const timestamp = new Date().toISOString();
 
+            console.log('HOST got all')
             window.RTC.systemSend({ type: PeerSystemMessageType.START, timestamp } as PeerSystemTimestampMessage);
           }
         }
         window.PEER.gotAll = true;
+        break;
       }
       case PeerSystemMessageType.START: {
         const { timestamp } = message as PeerSystemTimestampMessage
+        console.log('WHAT SHOULD WE DO NOW? HOST SAID START!!');
         window.UNITY.start(timestamp);
+        break;
       }
     }
   },

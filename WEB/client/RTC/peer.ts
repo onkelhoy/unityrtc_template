@@ -5,7 +5,7 @@ import {
 
   SocketTypes
 } from '../common';
-import { ErrorType, SendFunction } from '../types';
+import { ErrorType, PeerSystemConnectionInitMessage, PeerSystemMessage, PeerSystemMessageType, SendFunction } from '../types';
 
 interface Channel {
   channel:RTCDataChannel,
@@ -94,6 +94,13 @@ class Peer {
   onDataChannel(event: RTCDataChannelEvent) {
     const channel = event.channel;
     this.setUpChannel(channel);
+
+    if (channel.label === window.PEER.system) {
+      this.systemSend(JSON.stringify({ 
+        type: PeerSystemMessageType.CONNECTION_INIT, 
+        id: window.ID 
+      } as PeerSystemConnectionInitMessage));
+    }
   }
 
   setUpChannel(channel:RTCDataChannel) {
@@ -167,6 +174,8 @@ class Peer {
     // we are connecting
     this.connection.setRemoteDescription(new RTCSessionDescription(desription));
 
+    this.createChannel(window.PEER.system);
+
     // creating and sending an answer to the offer
     return this.connection
       .createAnswer()
@@ -199,6 +208,7 @@ class Peer {
       this.channels[window.PEER.system].channel.send(message);
     } else {
       // store if for later
+      console.log('system message stored for later');
       this.channels[window.PEER.system].queue.push(message);
     }
   }

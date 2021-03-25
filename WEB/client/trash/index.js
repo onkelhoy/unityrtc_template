@@ -13,9 +13,14 @@ window.PEER = {
     gotAll: false,
     systemPeerMessage: function (peer_id, event) {
         var message = JSON.parse(event.data);
-        console.log('SYSTEM MESSAGE', peer_id, message);
         switch (message.type) {
+            case types_1.PeerSystemMessageType.CONNECTION_INIT: {
+                var id = message.id;
+                console.log('RTC init from', id);
+                break;
+            }
             case types_1.PeerSystemMessageType.GAME_LOADED: {
+                console.log('GAME LOADED LASKLKDLAKDLAKSD');
                 if (window.RTC.peers[peer_id]) {
                     window.RTC.peers[peer_id].gameLoaded = true;
                 }
@@ -29,14 +34,18 @@ window.PEER = {
                 if (!window.PEER.gotAll) {
                     if (window.HOST === window.ID) {
                         var timestamp = new Date().toISOString();
+                        console.log('HOST got all');
                         window.RTC.systemSend({ type: types_1.PeerSystemMessageType.START, timestamp: timestamp });
                     }
                 }
                 window.PEER.gotAll = true;
+                break;
             }
             case types_1.PeerSystemMessageType.START: {
                 var timestamp = message.timestamp;
+                console.log('WHAT SHOULD WE DO NOW? HOST SAID START!!');
                 window.UNITY.start(timestamp);
+                break;
             }
         }
     },

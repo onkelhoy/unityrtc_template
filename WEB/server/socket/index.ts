@@ -16,6 +16,7 @@ import {
   SocketMessageOffer,
   SocketTypes,
   SocketErrorType,
+  SocketFarwell,
 } from '../common';
 import { 
   Socket, 
@@ -56,7 +57,7 @@ function onMessage(this:Socket, message: string) {
     case SocketTypes.Create: 
       return create(user, data as SocketRequestCreate);
     case SocketTypes.Farwell:
-      return farwell(user);
+      return farwell(user, data as SocketFarwell);
     case SocketTypes.HeartBeat:
       return heartbeat(user);
   }
@@ -83,9 +84,9 @@ function heartbeat(user:Socket) {
   user.heartbeat = Date.now();
 }
 
-function farwell(user:Socket) {
+function farwell(user:Socket, message:SocketFarwell) {
   roomCheck(user, () => {
-    if (rooms[user.room].farwell(user)) {
+    if (rooms[user.room].farwell(user, message.timestamp)) {
       delete rooms[user.room];
       console.log('room deleted', user.room);
     } 

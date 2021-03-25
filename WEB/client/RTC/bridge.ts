@@ -10,6 +10,7 @@ import { 
   SocketTypes,
   SocketErrorType,
   SocketMessageError,
+  SocketFarwell,
 } from '../common';
 import { PeerSystemMessage, SendFunction } from '../types';
 
@@ -43,9 +44,9 @@ class Bridge {
   _onerror = ({ message, error } : SocketMessageError) => {
     window.WEB.socketError(error, message);
   }
-  _farwell = (timestamp:string) => {
+  _farwell = ({ timestamp } : SocketFarwell ) => {
     // SECTION GAME-START 
-    window.UI.start(timestamp);
+    window.UI.start(new Date(timestamp).toISOString());
     if (this.socket) this.terminateSocket();
   }
   _hostChange = ({ host } : SocketMessageHostChange) => {
@@ -93,9 +94,9 @@ class Bridge {
       this.peers[peer].systemSend(JSON.stringify(message));
     }
   }
-  
+
   start () {
-    this.socket.send({ type: SocketTypes.Farwell });
+    this.socket.send({ type: SocketTypes.Farwell, timestamp: new Date().getTime() } as SocketFarwell);
   }
 
   // UNITY-TO-WEB

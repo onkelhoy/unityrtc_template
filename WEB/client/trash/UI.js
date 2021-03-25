@@ -129,8 +129,9 @@ function LoadUnity(timestamp) {
             switch (_a.label) {
                 case 0:
                     if (!!window.UNITY.loaded) return [3, 3];
+                    console.log('UNITY LOADING...');
                     window.UNITY.loaded = true;
-                    console.log(timestamp);
+                    console.log('timestamp', timestamp);
                     return [4, fetch('/set-unity-preference', {
                             method: "post",
                             headers: {
@@ -149,11 +150,12 @@ function LoadUnity(timestamp) {
                     return [4, response.json()];
                 case 2:
                     name_1 = (_a.sent()).name;
-                    console.log('version', name_1);
+                    console.log('GAME version:', name_1);
                     script = document.createElement("script");
                     script.src = '/Build/UnityLoader.js';
                     script.onload = function () {
                         setActive('game');
+                        console.log(name_1);
                         window.UNITY.instance = window.UNITY.Loader.instantiate("unityContainer", "Build/" + name_1 + ".json", { onProgress: onProgress });
                     };
                     document.head.appendChild(script);
@@ -164,7 +166,8 @@ function LoadUnity(timestamp) {
     });
 }
 function onProgress(unityInstance, progress) {
-    if (progress >= 1) {
+    console.log('PROGRES', progress);
+    if (progress >= 1 || !progress) {
         console.log('UNITY IS NOW LOADED');
         unityInstance.SetFullscreen();
         window.RTC.systemSend({ type: types_1.PeerSystemMessageType.GAME_LOADED });

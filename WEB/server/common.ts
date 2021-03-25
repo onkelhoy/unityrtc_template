@@ -35,6 +35,10 @@ export interface SocketRequestCreate extends SocketMessage {
   password?:string
 }
 
+export interface SocketFarwell extends SocketMessage {
+  timestamp:number;
+}
+
 export interface SocketRequestJoin extends SocketRequestCreate {}
 
 export interface SocketRequestLeave extends SocketRequestMessage {}

@@ -8,12 +8,13 @@ var ErrorType;
 })(ErrorType = exports.ErrorType || (exports.ErrorType = {}));
 var MODE;
 (function (MODE) {
-    MODE[MODE["MENU"] = 0] = "MENU";
-    MODE[MODE["GAME"] = 1] = "GAME";
+    MODE[MODE["MENU"] = 1] = "MENU";
+    MODE[MODE["GAME"] = 2] = "GAME";
 })(MODE = exports.MODE || (exports.MODE = {}));
 var PeerSystemMessageType;
 (function (PeerSystemMessageType) {
-    PeerSystemMessageType[PeerSystemMessageType["GAME_LOADED"] = 0] = "GAME_LOADED";
-    PeerSystemMessageType[PeerSystemMessageType["ALL"] = 1] = "ALL";
-    PeerSystemMessageType[PeerSystemMessageType["START"] = 2] = "START";
+    PeerSystemMessageType[PeerSystemMessageType["GAME_LOADED"] = 1] = "GAME_LOADED";
+    PeerSystemMessageType[PeerSystemMessageType["ALL"] = 2] = "ALL";
+    PeerSystemMessageType[PeerSystemMessageType["START"] = 3] = "START";
+    PeerSystemMessageType[PeerSystemMessageType["CONNECTION_INIT"] = 4] = "CONNECTION_INIT";
 })(PeerSystemMessageType = exports.PeerSystemMessageType || (exports.PeerSystemMessageType = {}));

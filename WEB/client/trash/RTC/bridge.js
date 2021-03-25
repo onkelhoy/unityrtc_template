@@ -10,8 +10,9 @@ var Bridge = (function () {
             var message = _a.message, error = _a.error;
             window.WEB.socketError(error, message);
         };
-        this._farwell = function (timestamp) {
-            window.UI.start(timestamp);
+        this._farwell = function (_a) {
+            var timestamp = _a.timestamp;
+            window.UI.start(new Date(timestamp).toISOString());
             if (_this.socket)
                 _this.terminateSocket();
         };
@@ -79,7 +80,7 @@ var Bridge = (function () {
         }
     };
     Bridge.prototype.start = function () {
-        this.socket.send({ type: common_1.SocketTypes.Farwell });
+        this.socket.send({ type: common_1.SocketTypes.Farwell, timestamp: new Date().getTime() });
     };
     Bridge.prototype.send = function (to, message, channels) {
         if (!this.peers[to])
