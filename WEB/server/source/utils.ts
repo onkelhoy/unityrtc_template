@@ -1,11 +1,11 @@
-import { Socket } from "./types";
-import { SocketMessage, SocketTypes } from "./common.types";
+import { ISocket } from "socket/types";
+import { ISocketMessage, SocketMessageType } from "types.global";
 
-export function sendTo (socket: Socket, message: SocketMessage) {
+export function sendTo (socket: ISocket, message: ISocketMessage) {
   const strmessage = JSON.stringify(message);
   socket.send(strmessage);
 
-  if (message.type === SocketTypes.Farwell) {
+  if (message.type === SocketMessageType.Farwell) {
     if (socket) socket.close();
   }
 };

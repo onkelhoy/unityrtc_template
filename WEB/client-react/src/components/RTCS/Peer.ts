@@ -1,33 +1,34 @@
 import { 
-  ISignalMessage, 
+  ISignalMessage,
   SocketMessageType, 
-  ICandidateMessage,
-  IAnswerMessage,
-  IOfferMessage,
   SignalType,
- } from "types";
-import { TSocketSendF } from "./types";
+  IOfferMessage,
+} from "types.global";
+
+import { 
+  TSocketSendF, 
+  IChannel, 
+  IChannelMessage, 
+  IPeer, 
+  PeerMessageType, 
+  IPeerMessage,
+} from "./types";
 
 import { Itryuntil, tryuntil } from 'utils';
-
-type TChannels = {[key:string]: Channel};
-interface IPeer {
-  channels:TChannels;
-  connection:RTCPeerConnection;
-  id:string;
-}
 
 const SYSTEM_NAME = 'system';
 const MAX_TRIES = 4; // maximum number of tries to resend message (queue system)
 
+type TChannels = {[key:string]: IChannel};
 export default class Peer implements IPeer {
   channels = {} as TChannels;
   connection;
   id;
   offerGenerator;
   answerGenerator;
+  username;
 
-  constructor(id:string, channels: string[], socketsend: TSocketSendF) {
+  constructor(id:string, channels: string[], socketsend: TSocketSendF, myusername:string) {
     const configuration = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -48,19 +49,22 @@ export default class Peer implements IPeer {
     }
     this.id = id;
 
-    this.offerGenerator = tryuntil(this._createOffer, socketsend);
+    this.username = 'no-username';
+    this.offerGenerator = tryuntil(this._createOffer, socketsend, myusername);
     this.answerGenerator = tryuntil(this._createAnswer);
+    this.connection.onicecandidate = event => this._onicecandidate(event, socketsend);
     this.connection.ondatachannel = this._ondatachannel.bind(this);
   }
 
-  async _createOffer(_index:number, socketsend: TSocketSendF) {
+  async _createOffer(_index:number, socketsend: TSocketSendF, myusername:string) {
     const offer = await this.connection.createOffer();
     this.connection.setLocalDescription(offer);
     socketsend({ 
       type: SocketMessageType.Signal, 
-      stype: SignalType.Offer,
+      signal: SignalType.Offer,
       target: this.id, 
-      offer 
+      data: offer,
+      username: myusername
     } as IOfferMessage);
   }
   async _createAnswer(_index:number, socketsend: TSocketSendF) {
@@ -69,10 +73,10 @@ export default class Peer implements IPeer {
     
     socketsend({ 
       type: SocketMessageType.Signal, 
-      stype: SignalType.Answer,
+      signal: SignalType.Answer,
       target: this.id, 
-      answer, 
-    } as IAnswerMessage);
+      data: answer, 
+    } as ISignalMessage);
   }
   async _try(generator:Itryuntil) {
     while (true) {
@@ -92,26 +96,36 @@ export default class Peer implements IPeer {
       this.channels[channel.label] = c;
     }
   }
+  _onicecandidate = (event: RTCPeerConnectionIceEvent, socketsend: TSocketSendF) => {
+    if (event.candidate) {
+      socketsend({
+        type: SocketMessageType.Signal,
+        signal: SignalType.Candidate,
+        data: event.candidate,
+        target: this.id,
+      } as ISignalMessage);
+    }
+  };
 
   async signal(message?: ISignalMessage) {
     try {
       if (message) {
-        switch (message.stype) {
+        switch (message.signal) {
           case SignalType.Offer: {
             // we are connecting
-            const { offer } = message as IOfferMessage;
-            this.connection.setRemoteDescription(new RTCSessionDescription(offer));
+            const { data } = message as ISignalMessage;
+            this.connection.setRemoteDescription(new RTCSessionDescription(data as RTCSessionDescriptionInit));
             this._try(this.answerGenerator);
             break;
           }
           case SignalType.Answer: {
-            const { answer } = message as IAnswerMessage;
-            this.connection.setRemoteDescription(new RTCSessionDescription(answer));
+            const { data } = message as ISignalMessage;
+            this.connection.setRemoteDescription(new RTCSessionDescription(data as RTCSessionDescriptionInit));
             break;
           }
           case SignalType.Candidate: {
-            const { candidate } = message as ICandidateMessage;
-            this.connection.addIceCandidate(new RTCIceCandidate(candidate));
+            const { data } = message as ISignalMessage;
+            this.connection.addIceCandidate(new RTCIceCandidate(data as RTCIceCandidateInit));
           }
         }
       }
@@ -126,14 +140,18 @@ export default class Peer implements IPeer {
     }
   }
 
-
-
   disconnect() {
+    this.SystemSend({ type: PeerMessageType.disconnect });
+
     for (const channel of Object.values(this.channels)) {
-      if (channel.stream) channel.stream.close();
+      channel.close();
     }
 
     this.connection.close();
+  }
+
+  SystemSend(message:IPeerMessage) {
+    this.channels[SYSTEM_NAME].Send(JSON.stringify(message));
   }
 
   Send(message:string, channels?:string|string[]):Boolean {
@@ -154,6 +172,8 @@ export default class Peer implements IPeer {
 
     let allOK:Boolean = true;
     for (let name of channels) {
+      if (name === SYSTEM_NAME) continue;
+
       if (this.channels[name]) {
         allOK = allOK && this.channels[name].Send(message);
       }
@@ -163,20 +183,10 @@ export default class Peer implements IPeer {
   }
 }
 
-// Helper classes
-
-interface ChannelMessage {
-  message:string;
-  tries:number;
-}
-
-interface IChannel {
-  stream?:RTCDataChannel,
-  queue:ChannelMessage[],
-}
+// help
 
 class Channel implements IChannel {
-  queue = [] as ChannelMessage[];
+  queue = [] as IChannelMessage[];
   name;
   stream?:RTCDataChannel;
 
@@ -185,38 +195,48 @@ class Channel implements IChannel {
     this.queue = [];
   }
 
-  _open() {
-
-  }
-  _error(error:RTCErrorEvent) {
-
-  }
-  _close() {
-    
-  }
-  _message(event:MessageEvent) {
-
+  close = () => {
+    this.stream?.close();
   }
 
+  onopen() {
+
+  }
+  onerror(error:RTCErrorEvent) {
+    if (!this.stream || this.stream.readyState !== "open") {
+      // TODO check connection state and reconnect if necessary (this time with peers)
+    }
+  }
+  onclose() {
+    // this data channel is trminated
+  }
+  onmessage(event:MessageEvent) {
+    if (this.name !== SYSTEM_NAME) {
+      console.log('incomming peer message on system channel', event.data);
+      // TODO implement system type check (switch)
+    }
+    else {
+      console.log('incomming peer message', event.data);
+      // TODO call unity
+    }
+  }
   Init(channel:RTCDataChannel, connection:webkitRTCPeerConnection) {
     if (this.stream) this.stream.close();
 
     this.stream = channel; // overriding stream
     this.Awake(connection);
   }
-
   Awake(connection:webkitRTCPeerConnection) {
     if (!this.stream) {
       const stream = connection.createDataChannel(this.name);
       this.stream = stream;
     }
 
-    this.stream.onmessage = this._message.bind(this);
-    this.stream.onerror = this._error.bind(this);
-    this.stream.onopen = this._open.bind(this);
-    this.stream.onclose = this._close.bind(this);
+    this.stream.onmessage = this.onmessage.bind(this);
+    this.stream.onerror = this.onerror.bind(this);
+    this.stream.onopen = this.onopen.bind(this);
+    this.stream.onclose = this.onclose.bind(this);
   }
-
   Send(message:string): Boolean {
     if (!this.stream || this.stream.readyState !== "open") {
       this.queue.push({ message, tries: 0 });

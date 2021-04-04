@@ -3,14 +3,8 @@ import {
   SocketMessageType,
   ISocketMessage, 
   ISignalMessage,
-} from 'types';
-import { IPeerUtils } from './types';
-
-interface ISocket {
-  ws:WebSocket;
-  peerUtils: IPeerUtils;
-  id:string;
-}
+} from 'types.global';
+import { IPeerUtils, ISocket } from './types';
 
 export default class Socket implements ISocket {
   ws;
@@ -34,7 +28,7 @@ export default class Socket implements ISocket {
     const message = JSON.parse(event.data) as ISocketMessage;
     switch (message.type) {
       case SocketMessageType.Heartbeat: {
-
+        this.Send({ type: SocketMessageType.Heartbeat });
         break;
       }
       case SocketMessageType.Leave: {
@@ -47,7 +41,10 @@ export default class Socket implements ISocket {
       }
       case SocketMessageType.Signal: {
         this.peerUtils.Signal(message as ISignalMessage)
-
+        break;
+      }
+      case SocketMessageType.Farwell: {
+        this.ws.close();
         break;
       }
     }

@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 
-import signalServer from "./socket";
+import signalServer from "socket";
 
 // initialize configuration
 dotenv.config();
@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, "./public")));
 // the same ws upgrade process described here:
 // https://www.npmjs.com/package/ws#mult(iple-servers-sharing-a-single-https-server
 const server = app.listen(port, function () {
-  console.log("Running UnityRTC-Template-Server on port:", port);
+  console.log("Running UnityRTC-Server on port:", port);
 });
 
 server.on("upgrade", (request, socket, head) => {

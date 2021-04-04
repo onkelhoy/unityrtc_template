@@ -1,83 +1,68 @@
 import WebSocket from "ws";
-import { sendTo } from "../utils";
-import { 
-  SocketRequestCandidate, 
-  SocketRequestOffer,
-  SocketRequestAnswer,
-  SocketRequestJoin,
-  SocketRequestCreate,
+import { sendTo } from "utils";
 
-  SocketMessage, 
-  SocketMessageError, 
-  SocketMessageCandidate, 
-  SocketMessageAnswer,
-  SocketMessageOffer,
-  SocketMessageCreate,  
-  SocketMessageJoin,
-  SocketMessageJoinAnswer,
-  SocketTypes,
-  SocketErrorType,
-} from '../common.types';
-import { 
-  Socket, 
-} from '../types';
+import {
+  SocketMessageType,
+  ISocketMessage,
+  ISignalMessage,
+  ISocketJoinMessage,
+  ErrorType,
+  ISocketMessageError,
+} from 'types.global';
+
+import { ISocket } from './types';
 
 import Room from "./room";
 
 const rooms:{[key:string]: Room} = {};
 const wss = new WebSocket.Server({ noServer: true });
 
-wss.on("connection", function (user:Socket) {
+wss.on("connection", function (user:ISocket) {
   user.on("message", onMessage.bind(user));
   user.on('close', onClose.bind(user));
 });
 
-function onMessage(this:Socket, message: string) {
-  const data = JSON.parse(message) as SocketMessage;
+function onMessage(this:ISocket, message: string) {
+  const data = JSON.parse(message) as ISocketMessage;
   const user = this;
 
   switch (data.type) {
-    case SocketTypes.Offer:
-      return offer(user, data as SocketRequestOffer);
-    case SocketTypes.Answer:
-      return answer(user, data as SocketRequestAnswer);
-    case SocketTypes.Candidate:
-      return candidate(user, data as SocketRequestCandidate);
-    case SocketTypes.Leave:
+    case SocketMessageType.Signal:
+      return signal(user, data as ISignalMessage);
+    case SocketMessageType.Leave:
       return leave(user);
-    case SocketTypes.Join:
-      return join(user, data as SocketRequestJoin);
-    case SocketTypes.Create: 
-      return create(user, data as SocketRequestCreate);
-    case SocketTypes.Farwell:
+    case SocketMessageType.Join:
+      return join(user, data as ISocketJoinMessage);
+    case SocketMessageType.Farwell:
       return farwell(user);
-    case SocketTypes.HeartBeat:
-      return heartbeat(user);
   }
 }
 
-function onClose(this:Socket) {
+
+function signal(user:ISocket, message:ISignalMessage) {
+  roomCheck(user, () => {
+    const signalMSG:ISignalMessage = { ...message, target: user.id };
+    rooms[user.room].send(message.target, signalMSG);
+  });
+}
+
+function onClose(this:ISocket) {
   leave(this);
 } 
 
-function roomCheck(user:Socket, cb:Function) {
+function roomCheck(user:ISocket, cb:Function) {
   const { room } = user;
 
   if (!!rooms[room]) cb();
   else {
     sendTo(user, {
-      type: SocketTypes.Error,
-      error: SocketErrorType.Room,
-      message: "Room is not existing",
-    } as SocketMessageError);
+      type: SocketMessageType.Error,
+      error: ErrorType.Connect,
+    } as ISocketMessageError);
   }
 }
 
-function heartbeat(user:Socket) {
-  user.heartbeat = Date.now();
-}
-
-function farwell(user:Socket) {
+function farwell(user:ISocket) {
   roomCheck(user, () => {
     if (rooms[user.room].farwell(user)) {
       delete rooms[user.room];
@@ -86,26 +71,14 @@ function farwell(user:Socket) {
   });
 }
 
-function join(user:Socket, message:SocketRequestJoin) {
-  if (rooms[message.room]) {
-    rooms[message.room].join(user, message.password);
-  } else {
-    sendTo(user, {
-      type: SocketTypes.Error,
-      error: SocketErrorType.Room,
-      message: "Room is not existing",
-    } as SocketMessageError);
+function join(user:ISocket, message:ISocketJoinMessage) {
+  if (!rooms[message.room]) {
+    rooms[message.room] = new Room(message.room, message.password);
   }
+  rooms[message.room].join(user, message);
 }
 
-function answer(user:Socket, message: SocketRequestAnswer) {
-  roomCheck(user, () => {
-    const newMessage:SocketMessageAnswer = { type: SocketTypes.Answer, from: message.from, answer: message.answer };
-    rooms[user.room].send(message.to, newMessage);
-  });
-}
-
-function leave(user:Socket) {
+function leave(user:ISocket) {
   roomCheck(user, () => {
     rooms[user.room].leave(user);
 
@@ -117,35 +90,6 @@ function leave(user:Socket) {
       // this requires interval checks (every hour check if rooms has existed more than x amount then delete)
     } 
   });
-}
-
-function offer(user:Socket, message: SocketRequestOffer) {
-  roomCheck(user, () => {
-    const newMessage:SocketMessageOffer = { type: SocketTypes.Offer, from: message.from, offer: message.offer };
-    rooms[user.room].send(message.to, newMessage);
-  });
-}
-
-function candidate(user:Socket, message:SocketRequestCandidate) {
-  roomCheck(user, () => {
-    const newMessage:SocketMessageCandidate = { type: SocketTypes.Candidate, from: message.from, candidate: message.candidate };
-    rooms[user.room].send(message.to, newMessage);
-  });
-}
-
-function create(user:Socket, message: SocketRequestCreate) {
-  if (rooms[message.room]) {
-    // error
-    sendTo(user, {
-      type: SocketTypes.Error,
-      error: SocketErrorType.Room,
-      message: "This room already exists",
-    } as SocketMessageError);
-  }
-
-  rooms[message.room] = new Room(message.room, message.password);
-
-  join(user, message as SocketRequestJoin);
 }
 
 export default wss;
