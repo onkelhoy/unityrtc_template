@@ -68,7 +68,14 @@ class Room {
         type: SocketMessageType.Leave, 
         target: user.id 
       } as ITargetSocketMessage);
-      this.host = Object.keys(this.users)[0];
+
+      if (user.id === this.host) {
+        this.host = Object.keys(this.users)[0];
+        this.broadcast(user, { 
+          type: SocketMessageType.HostChange, 
+          target: this.host 
+        } as ITargetSocketMessage);
+      }
     }
   }
 
