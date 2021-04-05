@@ -1,8 +1,14 @@
 import React from 'react';
+import { Context } from 'components/RTCS';
+import { PeerMessageType } from 'components/RTCS/types';
 
 function Lobby() {
+  const { peers, username, host, id, SystemBroadcast } = React.useContext(Context);
   function start() {
-
+    console.log('start is pressed', 'call')
+    if (id === host) {
+      SystemBroadcast({ type: PeerMessageType.start });
+    }
   }
   
   return (
@@ -11,9 +17,10 @@ function Lobby() {
       <span id="lobbyerror" className="error"></span>
 
       <ul id="peers">
-        <li className="you">YOU</li>
+        <li className={['me', id === host ? 'host' : ''].join(' ')}>{username}</li>
+        {peers.map(p => <li className={p.id === host ? 'host' : ''} key={p.id}>{p.username}</li>)}
       </ul>
-      <div className="start"><button id="start" onClick={start} disabled>Start Game</button></div>
+      <div className="start"><button id="start" onClick={start} disabled={id !== host}>Start Game</button></div>
     </div>
   );
 }

@@ -16,6 +16,8 @@ import {
   Tpeers, 
   SetType,
   SocketReadyState,
+  PeerMessageType,
+  IPeerMessage,
 } from './types';
 import Context from './context';
 
@@ -41,6 +43,7 @@ class RTCS extends React.Component implements IRTCS {
     ID: '',
     HOST: '',
     USERNAME: '',
+    canstart: false,
 
     peers: {} as Tpeers,
   };
@@ -48,6 +51,7 @@ class RTCS extends React.Component implements IRTCS {
   // ["system", "default"]
 
   socket;
+  loaded = 0;
 
   constructor(props: IProps) {
     super(props);
@@ -55,16 +59,15 @@ class RTCS extends React.Component implements IRTCS {
       Join: this._peerjoin,
       Leave: this._peerleave,
       Signal: this._peersignal,
+      Host: this._hostchange,
     } as IPeerUtils);
   }
 
   _peerjoin (message: ITargetJoinSocketMessage) {
-    if (!this.state.peers[message.target]) {
-      const peer = new Peer(message.target, CHANNELS, this.socket.Send, this.state.USERNAME);
-      peer.username = message.username;
-      peer.signal();
-      this.setState({ peers: { ...this.state.peers, [peer.id]: peer } });
-    }
+    const peer = this._createPeer(message.target);
+    peer.username = message.username;
+    peer.signal();
+    this.setState({ peers: { ...this.state.peers, [peer.id]: peer } });
   }
   _peerleave (message: ITargetSocketMessage) {
     const peer = this.state.peers[message.target];
@@ -77,28 +80,67 @@ class RTCS extends React.Component implements IRTCS {
     }
   }
   _peersignal (message: ISignalMessage) {
-    const peer = this.state.peers[message.target];
-    if (peer) peer.signal(message);
+    const peer = this._createPeer(message.target);
+
+    peer.signal(message);
+  }
+  _createPeer(target:string) {
+    let peer = this.state.peers[target];
+    if (!peer) peer = new Peer(target, CHANNELS, this.socket.Send, this.state.USERNAME);
+
+    peer.onSystemMessage = this._onsystemmessage.bind(this);
+    return peer;
+  }
+  _hostchange(message: ITargetSocketMessage) {
+    this.setState({ HOST: message.target });
+  }
+  _onsystemmessage(target:string, event:MessageEvent) {
+    const message = JSON.parse(event.data) as IPeerMessage;
+    switch(message.type) {
+      case PeerMessageType.start: {
+        console.log('GOT THE START MESSAGE')
+        // TODO set dimensions and gather the game
+        break;
+      }
+      case PeerMessageType.disconnect: {
+        this._peerleave({ target, type: SocketMessageType.Leave } as ITargetSocketMessage);
+        break;
+      }
+      case PeerMessageType.all: {
+        this.setState({ canstart: true });
+        break;
+      }
+      case PeerMessageType.loaded: {
+        this.loaded++;
+        if (!this.state.canstart && this.loaded === Object.keys(this.state.peers).length) {
+          this.SystemBroadcast({ type: PeerMessageType.all });
+          this.setState({ canstart: true });
+        }
+        break;
+      }
+    }
   }
 
-  // _getPeer(id:string) {
-  //   let peer = this.state.peers[id];
-  //   if (!peer) {
-  //     peer = new Peer(id, CHANNELS, this.socket.Send);
-  //     this.setState({ [id]: Peer });
-  //   }
-
-  //   return peer;
-  // }
-
+  SystemBroadcast(message:IPeerMessage) {
+    const msg = JSON.stringify(message);
+    for (const id in this.state.peers) {
+      this.state.peers[id].SystemSend(msg);
+    }
+  }
 
   // outgoing methods
-  Send = () => {
-
+  Send = (target:string, message:string, channels?:string|string[]):Boolean => {
+    if (this.state.peers[target]) return this.state.peers[target].Send(message, channels);
+    return false;
   }
 
-  Broadcast = () => {
+  Broadcast = (message:string, channels?:string|string[]):Boolean => {
+    let ok:Boolean = true;
+    for (const id in this.state.peers) {
+      ok = ok && this.state.peers[id].Send(message, channels);
+    }
 
+    return ok;
   }
 
   Disconnect = () => {
@@ -116,18 +158,18 @@ class RTCS extends React.Component implements IRTCS {
     this.socket.Send({ type: SocketMessageType.Join, room, password, username } as ISocketJoinMessage)
   }
 
-  Set = (type:SetType, value:string) => {
-    this.setState({ [type]: value });
-  }
-
   render() {
 
     const provides:IContext = {
       Send: this.Send,
       Join: this.Join,
-      Leave: this.Leave,
-      Set: this.Set,
+      peers: Object.values(this.state.peers),
+      username: this.state.USERNAME,
+      id: this.state.ID,
+      host: this.state.HOST,
+      Disconnect: this.Disconnect,
       Broadcast: this.Broadcast,
+      SystemBroadcast: this.SystemBroadcast,
     };
 
     return (

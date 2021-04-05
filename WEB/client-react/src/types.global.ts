@@ -3,6 +3,7 @@ export enum SocketMessageType {
   Join,
   Leave,
   Heartbeat,
+  HostChange,
   Connect,
   Farwell,
   Error,

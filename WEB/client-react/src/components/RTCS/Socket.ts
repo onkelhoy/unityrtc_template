@@ -27,6 +27,10 @@ export default class Socket implements ISocket {
   _message(event:MessageEvent<string>) {
     const message = JSON.parse(event.data) as ISocketMessage;
     switch (message.type) {
+      case SocketMessageType.HostChange: {
+        this.peerUtils.Host(message as ITargetSocketMessage);
+        break;
+      }
       case SocketMessageType.Heartbeat: {
         this.Send({ type: SocketMessageType.Heartbeat });
         break;

@@ -27,3 +27,9 @@ export async function* tryuntil(func:(index:number, ...params:any[])=>void, ...p
     if (index >= 10) break;
   }
 }
+
+export function sendToUnity(method:'message'|'start'|'disconnect', message:string):void {
+  // if (window.PEER.instance) {
+  //   window.PEER.instance.SendMessage("RTC", method, message);
+  // }
+}

@@ -10,8 +10,7 @@ import {
   IChannel, 
   IChannelMessage, 
   IPeer, 
-  PeerMessageType, 
-  IPeerMessage,
+  PeerStatus, 
 } from "./types";
 
 import { Itryuntil, tryuntil } from 'utils';
@@ -27,6 +26,7 @@ export default class Peer implements IPeer {
   offerGenerator;
   answerGenerator;
   username;
+  status = PeerStatus.signaling;
 
   constructor(id:string, channels: string[], socketsend: TSocketSendF, myusername:string) {
     const configuration = {
@@ -43,9 +43,9 @@ export default class Peer implements IPeer {
       this.connection = new webkitRTCPeerConnection(configuration);
     }
 
-    this.channels[SYSTEM_NAME] = new Channel(SYSTEM_NAME);
+    this.channels[SYSTEM_NAME] = new Channel(SYSTEM_NAME, id);
     for (const name of channels) {
-      if (name !== SYSTEM_NAME) this.channels[name] = new Channel(name);
+      if (name !== SYSTEM_NAME) this.channels[name] = new Channel(name, id);
     }
     this.id = id;
 
@@ -88,14 +88,15 @@ export default class Peer implements IPeer {
   }
   _ondatachannel (event: RTCDataChannelEvent) {
     const channel = event.channel;
-    if (this.channels[channel.label]) this.channels[channel.label].Init(channel, this.connection);
+    if (this.channels[channel.label]) this.channels[channel.label].Init(channel, this);
     else {
-      const c = new Channel(channel.label);
-      c.Init(channel, this.connection);
+      const c = new Channel(channel.label, this.id);
+      c.Init(channel, this);
 
       this.channels[channel.label] = c;
     }
   }
+  // when candidate is created from our side
   _onicecandidate = (event: RTCPeerConnectionIceEvent, socketsend: TSocketSendF) => {
     if (event.candidate) {
       socketsend({
@@ -107,31 +108,52 @@ export default class Peer implements IPeer {
     }
   };
 
+  ondatachannelclose = (name:string) => {
+    if (!this.channels[name]) return;
+
+    if (this.status === PeerStatus.open) {
+      this.channels[name].Awake(this);
+    }
+    else delete this.channels[name]; 
+  }
+  onSystemMessage = (name:string, event:MessageEvent) => {
+    console.log('system message method is overriden!');
+  }
+  ondatachannelmessage = (name:string, event:MessageEvent) => {
+    if (name !== SYSTEM_NAME) {
+      this.onSystemMessage(this.id, event);
+    }
+    else window.UNITY.message(name, this.id, event.data);
+  }
+
   async signal(message?: ISignalMessage) {
     try {
       if (message) {
         switch (message.signal) {
-          case SignalType.Offer: {
+          case SignalType.Offer: { // incomming offer
             // we are connecting
-            const { data } = message as ISignalMessage;
+            this.status = PeerStatus.open;
+            const { data, username } = message as IOfferMessage;
+            this.username = username;
             this.connection.setRemoteDescription(new RTCSessionDescription(data as RTCSessionDescriptionInit));
             this._try(this.answerGenerator);
             break;
           }
-          case SignalType.Answer: {
+          case SignalType.Answer: { // incomming answer
+            this.status = PeerStatus.open;
             const { data } = message as ISignalMessage;
             this.connection.setRemoteDescription(new RTCSessionDescription(data as RTCSessionDescriptionInit));
             break;
           }
-          case SignalType.Candidate: {
+          case SignalType.Candidate: { // incomming candidate
             const { data } = message as ISignalMessage;
             this.connection.addIceCandidate(new RTCIceCandidate(data as RTCIceCandidateInit));
           }
         }
       }
-      else {
+      else { // creating an offer
         // awake all channels
-        Object.values(this.channels).forEach(channel => channel.Awake(this.connection));
+        Object.values(this.channels).forEach(channel => channel.Awake(this));
         this._try(this.offerGenerator);
       }
     }
@@ -141,7 +163,7 @@ export default class Peer implements IPeer {
   }
 
   disconnect() {
-    this.SystemSend({ type: PeerMessageType.disconnect });
+    this.status = PeerStatus.closed;
 
     for (const channel of Object.values(this.channels)) {
       channel.close();
@@ -150,8 +172,8 @@ export default class Peer implements IPeer {
     this.connection.close();
   }
 
-  SystemSend(message:IPeerMessage) {
-    this.channels[SYSTEM_NAME].Send(JSON.stringify(message));
+  SystemSend(message:string) {
+    this.channels[SYSTEM_NAME].Send(message);
   }
 
   Send(message:string, channels?:string|string[]):Boolean {
@@ -161,13 +183,7 @@ export default class Peer implements IPeer {
 
     if (!channels) {
       // system
-      if (!this.channels[SYSTEM_NAME]) {
-        console.log('system channel has not been created!');
-        return false;
-      }
-
-      this.channels[SYSTEM_NAME].Send(message);
-      return true;
+      channels = Object.keys(this.channels);
     }
 
     let allOK:Boolean = true;
@@ -188,9 +204,10 @@ export default class Peer implements IPeer {
 class Channel implements IChannel {
   queue = [] as IChannelMessage[];
   name;
+  tries = 0;
   stream?:RTCDataChannel;
 
-  constructor(name:string) {
+  constructor(name:string, peer:string) {
     this.name = name;
     this.queue = [];
   }
@@ -207,35 +224,28 @@ class Channel implements IChannel {
       // TODO check connection state and reconnect if necessary (this time with peers)
     }
   }
-  onclose() {
-    // this data channel is trminated
-  }
-  onmessage(event:MessageEvent) {
-    if (this.name !== SYSTEM_NAME) {
-      console.log('incomming peer message on system channel', event.data);
-      // TODO implement system type check (switch)
-    }
-    else {
-      console.log('incomming peer message', event.data);
-      // TODO call unity
-    }
-  }
-  Init(channel:RTCDataChannel, connection:webkitRTCPeerConnection) {
+
+  Init(channel:RTCDataChannel, peer:IPeer) {
     if (this.stream) this.stream.close();
 
     this.stream = channel; // overriding stream
-    this.Awake(connection);
+    this.Awake(peer);
   }
-  Awake(connection:webkitRTCPeerConnection) {
+  Awake(peer:IPeer) {
+    if (this.tries < 10) {
+      console.log('Data channel lost more then 10x now..');
+      return;
+    }
+    this.tries++;
     if (!this.stream) {
-      const stream = connection.createDataChannel(this.name);
+      const stream = peer.connection.createDataChannel(this.name);
       this.stream = stream;
     }
 
-    this.stream.onmessage = this.onmessage.bind(this);
+    this.stream.onmessage = event => peer.ondatachannelmessage(this.name, event);
     this.stream.onerror = this.onerror.bind(this);
     this.stream.onopen = this.onopen.bind(this);
-    this.stream.onclose = this.onclose.bind(this);
+    this.stream.onclose = () => peer.ondatachannelclose(this.name);
   }
   Send(message:string): Boolean {
     if (!this.stream || this.stream.readyState !== "open") {
