@@ -1,12 +1,12 @@
-import WebSocket from 'ws';
-import { SocketMessage } from 'common.types';
+import WebSocket from "ws";
+import { ISocketMessage } from "types.global";
 
 export interface ISocket extends WebSocket {
-  room:string;
-  id:string;
-  heartbeat:number;
+  room: string;
+  id: string;
+  heartbeat: number;
 }
 
-export interface IMessage extends SocketMessage  {
+export interface IMessage extends ISocketMessage {
   message: string;
 }

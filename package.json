@@ -5,7 +5,7 @@
   "scripts": {
     "b:web": "cd WEB && npm run build",
     "b:complete": "cd scripts/ && sh build.sh",
-    "start": "node product/index.js",
+    "start": "node build/index.js",
     "prepare": "cd scripts/ && sh prepare.sh"
   },
   "repository": {

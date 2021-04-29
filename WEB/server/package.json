@@ -4,7 +4,7 @@
   "description": "template bridge for unity and webrtc for the webgl builds",
   "main": "source/index.ts",
   "scripts": {
-    "start": "node product",
+    "start": "node source/index",
     "build": "tsc",
     "watch": "tsc -w"
   },
